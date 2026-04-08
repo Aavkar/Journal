@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="Trade Journal">
+<title>Trade Journal</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#080810;color:#e0e0f0;font-family:monospace;min-height:100vh}
+.page{display:none}.page.active{display:block}
+.hdr{background:#0d0d1a;border-bottom:1px solid #1a1a2e;padding:16px 20px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:10}
+.logo{font-size:12px;letter-spacing:0.2em;color:#00d4ff;text-transform:uppercase}
+.hbtn{background:none;border:none;color:#444466;cursor:pointer;font-size:11px;font-family:monospace;padding:4px 8px}
+.wrap{padding:20px;max-width:660px;margin:0 auto;padding-bottom:50px}
+h1{font-size:20px;font-weight:700;margin-bottom:6px}
+.sub{font-size:12px;color:#5555aa;margin-bottom:22px}
+.card{background:#0d0d1a;border:1px solid #1a1a2e;border-radius:12px;padding:20px;margin-bottom:14px}
+label{font-size:10px;letter-spacing:0.15em;color:#5555aa;text-transform:uppercase;margin-bottom:6px;display:block}
+input{width:100%;background:#08080f;border:1px solid #252538;border-radius:8px;color:#e0e0f0;font-size:15px;padding:13px 15px;font-family:monospace;outline:none;margin-bottom:14px}
+textarea{width:100%;background:#08080f;border:1px solid #252538;border-radius:8px;color:#e0e0f0;font-size:16px;padding:13px 15px;font-family:monospace;outline:none;min-height:200px;resize:vertical;line-height:1.6;display:block;margin-bottom:10px}
+.btn{display:block;width:100%;border:none;border-radius:10px;padding:15px;font-size:13px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;font-family:monospace;margin-top:8px}
+.bc{background:#00d4ff;color:#000}
+.bo{background:#ff9500;color:#000}
+.bg{background:#00e676;color:#000}
+.bd{background:#1a1a2e;color:#8080cc}
+.mrow{display:flex;gap:10px;margin-bottom:14px}
+.mbtn{flex:1;background:#0d0d1a;border-radius:12px;padding:18px 8px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;cursor:pointer;font-family:monospace;text-align:center;font-size:12px}
+.mc{border:2px solid #00d4ff;color:#00d4ff}
+.mo{border:2px solid #ff9500;color:#ff9500}
+.mg{border:2px solid #00e676;color:#00e676}
+.err{background:#1a0808;border:1px solid #ff333340;border-radius:8px;padding:12px;font-size:11px;color:#ff8888;word-break:break-all;line-height:1.6;margin-bottom:12px}
+.ok{background:#001a0d;border:1px solid #00e67630;border-radius:10px;padding:14px 18px;margin-bottom:18px;display:flex;align-items:center;gap:12px}
+.fr{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #0f0f1e;gap:10px}
+.fr:last-child{border-bottom:none}
+.fk{font-size:10px;color:#5555aa;min-width:130px}
+.fv{font-size:12px;color:#e0e0f0;text-align:right;word-break:break-word;max-width:200px}
+.note{font-size:10px;color:#333355;line-height:1.8;margin-bottom:16px}
+.proc{text-align:center;padding-top:80px}
+.wc{font-size:10px;color:#252540;text-align:right;margin-bottom:14px}
+.fbtns{display:flex;gap:10px;margin-top:8px}
+.fbtns .btn{flex:1;margin-top:0}
+</style>
+</head>
+<body>
+
+<!-- SETUP -->
+<div id="p-setup" class="page active">
+  <div class="hdr"><span class="logo">Avkar · Trading Journal</span><span style="font-size:10px;color:#333355">v4.0</span></div>
+  <div class="wrap">
+    <h1>Setup</h1>
+    <div class="sub">Saved on this device</div>
+    <div class="card">
+      <label>Anthropic API Key</label>
+      <input id="ak" type="password" placeholder="sk-ant-...">
+      <div class="note">Get free at <strong style="color:#00d4ff">console.anthropic.com</strong> → API Keys<br>~$0.01 per entry (Haiku model)</div>
+      <label>Google Spreadsheet ID</label>
+      <input id="sid" placeholder="From URL: /d/YOUR_ID/edit">
+      <label>Google API Key</label>
+      <input id="gk" type="password" placeholder="AIzaSy...">
+      <div class="note">Sheet: <strong style="color:#00d4ff">Trading Journal 2026</strong><br>4 tabs: Pre-Market Prep · Trade Log · EOD Debrief · Daily Life &amp; Identity</div>
+      <div id="setup-err"></div>
+      <button class="btn bc" onclick="goMode()">Save &amp; Continue →</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODE -->
+<div id="p-mode" class="page">
+  <div class="hdr"><span class="logo">Avkar · Trading Journal</span><button class="hbtn" onclick="show('setup')">⚙ SETUP</button></div>
+  <div class="wrap">
+    <h1>What are you logging?</h1>
+    <div class="sub">Choose your session type</div>
+    <div class="mrow">
+      <button class="mbtn mc" onclick="setMode('premarket')"><div style="font-size:22px;margin-bottom:8px">🌅</div>Pre-Market<br>Prep</button>
+      <button class="mbtn mo" onclick="setMode('tradelog')"><div style="font-size:22px;margin-bottom:8px">📊</div>Trade<br>Log</button>
+      <button class="mbtn mg" onclick="setMode('eod')"><div style="font-size:22px;margin-bottom:8px">🌙</div>End of<br>Day</button>
+    </div>
+    <div class="card note">
+      <span style="color:#00d4ff">PRE-MARKET</span> → Tab 1 · 57 fields<br>
+      <span style="color:#ff9500">TRADE LOG</span> → Tab 2 · 83 fields per trade<br>
+      <span style="color:#00e676">END OF DAY</span> → Tab 3 + Tab 4 · 193 fields
+    </div>
+  </div>
+</div>
+
+<!-- INPUT -->
+<div id="p-input" class="page">
+  <div class="hdr"><span class="logo">Avkar · Trading Journal</span><button class="hbtn" onclick="show('mode')">← BACK</button></div>
+  <div class="wrap">
+    <div id="mode-tag" style="margin-bottom:14px"></div>
+    <div id="input-err"></div>
+    <textarea id="transcript" placeholder="Speak or type your debrief freely…" oninput="updateWC()"></textarea>
+    <div id="wc" class="wc">0 words</div>
+    <button id="submit-btn" class="btn bc" onclick="doSubmit()">Extract &amp; Save to Google Sheets →</button>
+    <div style="font-size:10px;color:#252540;text-align:center;margin-top:10px">Tap text area · use mic on iPad keyboard</div>
+  </div>
+</div>
+
+<!-- PROCESSING -->
+<div id="p-processing" class="page">
+  <div class="hdr"><span class="logo">Avkar · Trading Journal</span></div>
+  <div class="wrap proc">
+    <div style="font-size:40px;margin-bottom:20px">⏳</div>
+    <div id="proc-title" style="font-size:15px;font-weight:700;margin-bottom:10px">Processing…</div>
+    <div id="proc-sub" style="font-size:12px;color:#5555aa;letter-spacing:0.08em"></div>
+    <div id="proc-note" style="font-size:10px;color:#333355;margin-top:16px"></div>
+  </div>
+</div>
+
+<!-- CONFIRM -->
+<div id="p-confirm" class="page">
+  <div class="hdr"><span class="logo">Avkar · Trading Journal</span><button class="hbtn" style="color:#00d4ff" onclick="show('mode')">+ NEW</button></div>
+  <div class="wrap">
+    <div class="ok"><span style="font-size:20px">✓</span><div><div style="font-size:14px;font-weight:700;color:#00e676">Logged to Google Sheets</div><div id="confirm-sub" style="font-size:10px;color:#004422"></div></div></div>
+    <div id="results"></div>
+    <div class="fbtns">
+      <button id="again-btn" class="btn bc" onclick="logAgain()">Log Another</button>
+      <button class="btn bd" style="flex:none;width:auto;padding:15px 20px" onclick="show('mode')">Menu</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── PROMPTS ───────────────────────────────────────────────────────────────────
+var PM_PROMPT = 'You are extracting structured data from a trading journal voice transcript for Avkar, an NQ futures trader. V1 = destructive pattern, V2 = true self. Extract ONLY what is explicitly mentioned, null for everything else. Return ONLY valid JSON, no markdown, no explanation.\n\nExtract these fields:\n{"date":"YYYY-MM-DD","day":"weekday","wake_up_time":"HH:MM","sleep_hours":0,"sleep_quality":"Poor/OK/Good","alcohol_previous_night":"Y/N","alcohol_amount":"Light/Moderate/Heavy","feeling_emotional_state":"Rush/Impatient/Calm/Tired/Anxious/Other","energy_level":0,"supplement_adhd_med":"Y/N","financial_stress_level":0,"survival_pressure_felt":"Y/N","cold_water_done":"Y/N","light_exercise_done":"Y/N","visualization_meditation_done":"Y/N","physiological_sighs_done":"Y/N","body_scan_done":"Y/N","body_scan_result":"text","identity_statement_read":"Y/N","alarmy_ritual_completed":"Y/N","music_playlist_on":"Y/N","which_version_today":"V1/V2/Mixed","v1_belief_active_morning":"text","v2_state_accessed":"Y/N","nervous_system_state":"word","inner_talk_morning":"V1 type/V2 type/Mixed","todays_single_behavioral_goal":"text","weekly_main_goal":"text","dopamine_bridge_planned":"text","timer_90min_set":"Y/N","account_type_today":"Demo/Eval","current_profit_target_pct":0,"above_60pct_profit_target":"Y/N","circuit_breaker_reviewed":"Y/N","stoic_morning_statement_read":"Y/N","previous_day_candle":"Strong green/Strong red/Doji/Hammer/Other","open_scenario":"text","qqq_vs_2day_avwap":"Above/Below","qqq_bias":"Bullish/Bearish/Neutral","market_short_term_trend":"Bullish/Bearish/Sideways","market_long_term_trend":"Bullish/Bearish/Sideways","mag7_strength":"Bullish/Bearish/Mixed","futures_direction":"Up/Down/Flat","key_levels_nq":"text","possible_entry_location":"text","main_plan":"text","entry_type":"Anticipated/Confirmed","entry_trigger":"text","stop_level":"text","invalidation":"text","two_scenarios":"text","max_loss_today":0,"max_trades_today":0,"levels_marked_on_chart":"Y/N","notes":"text","active_v1_belief_entering_session":"text","window_of_tolerance_score_open":0}\n\nTranscript:';
+
+var TL_PROMPT = 'You are extracting structured data from a trading journal voice transcript for Avkar, an NQ futures trader. V1 = destructive pattern, V2 = true self. Extract ONLY what is explicitly mentioned, null for everything else. Return ONLY valid JSON, no markdown, no explanation.\n\nExtract these fields:\n{"date":"YYYY-MM-DD","time_of_entry":"HH:MM","trade_type":"Main Setup/Scalp","trade_number_today":0,"account_type":"Demo/Eval","profit_target_pct_before_trade":0,"above_60pct_threshold":"Y/N","qqq_vs_2day_avwap":"Above/Below","directional_bias":"Bullish/Bearish","bias_confirmed_before_entry":"Y/N","entry_level_type":"text","planned_entry":"text","actual_entry":"text","entry_deviation_points":0,"addon_level":"text","planned_stop":"text","actual_stop":"text","invalidation_level":"text","target_level":"text","position_size_first_entry":0,"did_you_add_on":"Y/N","addon_size":0,"total_position_size":0,"size_increased_after_loss":"Y/N","exit_level":"text","pnl":0,"exit_reason":"Target Hit/Stop Hit/Fear/Moved Stop/Other","pre_trade_body_check_done":"Y/N","mouse_gate_used":"Y/N","verbal_narration_used":"Y/N","back_position_before_entry":"Y/N","five_second_rule_used":"Y/N","five_second_rule_what_happened":"text","followed_plan":"Y/N","what_changed":"text","hesitated_at_valid_setup":"Y/N","hesitation_duration":"text","entered_before_confirmation":"Y/N","exited_before_target":"Y/N","held_as_long_as_planned":"Y/N","stop_moved":"Y/N","added_within_risk_params":"Y/N","zombie_mode_entry":"Y/N","recovery_trade":"Y/N","random_candle_entry":"Y/N","idea_properly_invalidated":"Y/N","which_version_entered":"V1/V2/Mixed","v1_inner_talk_detected":"Y/N","v1_inner_talk_content":"text","v2_inner_talk_used":"Y/N","v2_inner_talk_content":"text","destruction_pattern_activated":"Y/N","chart_event_triggered_v1":"text","thought_that_followed":"text","feeling_that_followed":"text","v1_behavior_resulted":"text","time_between_trigger_and_action":"text","moment_of_choice_existed":"Y/N","what_interrupted_it":"text","v2_response_next_time":"text","v2_thought_replacement":"text","ifthen_goes_on_card":"Y/N","emotion_before_entry":"word","emotion_during_trade":"word","emotion_at_exit":"word","tilt_stage_during_trade":"None/Stage 1/Stage 2/Stage 3","body_sensation":"text","cortisol_spike":"Y/N","fomo_present":"Y/N","survival_pressure_during_trade":"Y/N","interruption_used":"Y/N","was_above_60pct_when_loss":"Y/N","circuit_breaker_triggered":"Y/N","platform_closed_immediately":"Y/N","waited_full_30_min":"Y/N","returned_and_traded_again":"Y/N","lesson":"text","what_id_do_differently":"text","notes":"text","defence_mechanism_during_trade":"text","defence_protecting_from":"text","secondary_gain_this_trade":"text","unmet_need_underneath":"text"}\n\nTranscript:';
+
+var E3_PROMPT = 'You are extracting EOD trading data for Avkar. V1=destructive, V2=true self. Extract ONLY what is mentioned, null for rest. Return ONLY valid JSON.\n\n{"date":"YYYY-MM-DD","account_type":"Demo/Eval","total_pnl":0,"profit_target_pct_eod":0,"total_trades":0,"planned_trades":0,"unplanned_trades":0,"plan_adherence_score":0,"behavioral_score":0,"session_duration":"text","binary_score":0,"consecutive_rule_following_days":0,"streak_broken_today":"Y/N","why_streak_broken":"text","p1_early_entries_count":0,"p2_skipped_after_loss_count":0,"p3_exited_early_count":0,"p4_zombie_trades_count":0,"destruction_pattern_activated":"Y/N","destruction_sequence_trigger":"text","where_caught_in_sequence":"text","size_increased_after_loss":"Y/N","recovery_trades_count":0,"was_above_60pct_during_session":"Y/N","circuit_breaker_triggered":"Y/N","honored_circuit_breaker":"Y/N","what_happened_after_circuit_breaker":"text","which_version_dominated":"V1/V2/Mixed","v1_beliefs_activated_today":"text","v1_inner_talk_caught":"Y/N","v1_inner_talk_content":"text","v2_behaviors_executed":"text","patient_score":0,"fearless_score":0,"disciplined_score":0,"consistent_score":0,"identity_consistency_score":0,"gap_v1_v2_today":"text","most_common_chart_trigger_today":"text","most_common_v1_thought_today":"text","ifthen_written_on_card":"Y/N","back_position_held":"Y/N","mouse_gate_consistent":"Y/N","verbal_narration_used":"Y/N","alarm_20min_used":"Y/N","pre_trade_body_check_pct":"text","interruption_used_session":"Y/N","five_second_rule_when_signal":"Y/N","what_went_well":"text","best_trade":"text","worst_trade":"text","most_in_control_moment":"text","most_out_of_control_moment":"text","behavior_to_carry_tomorrow":"text","tomorrows_single_adjustment":"text","replay_moment":"text","attention_drift_count":0,"ns_recovery_breath_count":0,"earliest_signal_caught":"text","tilt_stage_first_noticed":"text","dopamine_seeking_session":"Y/N","cortisol_spike_after_loss":"Y/N","recovered_from_loss":"Y/N","attention_quality":"Locked in/Drifting/Scattered","dopamine_bridge_used":"Y/N","survival_pressure_affected_trading":"Y/N","financial_stress_impact":"None/Minor/Major","evening_training_done":"Y/N","body_scan_done_evening":"Y/N","tilt_interruption_rehearsal_done":"Y/N","tomorrows_ifthen_rule":"text","one_win_today_behavioral":"text","one_correction_tomorrow":"text","overall_emotional_state":"text","energy_level_eod":0,"notes":"text","primary_defence_mechanism_today":"text","secondary_gain_worst_behavior":"text","result_confirmed_v1_belief":"Y/N","which_v1_belief_confirmed":"text","win_accepted_or_dismissed":"Accepted/Dismissed as luck/N/A"}\n\nTranscript:';
+
+var E4_PROMPT = 'You are extracting daily life and identity data for Avkar. V1=destructive, V2=true self (cricket kid). Extract ONLY what is mentioned, null for rest. Return ONLY valid JSON.\n\n{"date":"YYYY-MM-DD","overall_v2_score":0,"which_version_dominated_life":"V1/V2/Mixed","acted_how_supposed_to":"Y/N","did_what_supposed_to":"Y/N","binary_score":0,"wake_up_state":"Tired/Confused/Blank/OK/Good","sleep_hours":0,"sleep_quality":"Poor/OK/Good","alcohol_last_night":"Y/N","alcohol_amount":"text","exercise_done":"Y/N","exercise_type":"text","nutrition_quality":"Poor/OK/Good","supplement_adhd_med":"Y/N","energy_level":0,"cold_exposure_done":"Y/N","mood_score":0,"mood_type":"text","dominant_feeling_today":"text","feeling_duration":"Most of the day/Few hours/Came and went","what_triggered_feeling":"text","anxiety_level":0,"financial_stress_level":0,"survival_pressure_felt":"Y/N","primary_feeling_today":"text","stress_source":"text","emotional_trigger_today":"text","how_handled_emotional_trigger":"V1 response/V2 response","v1_belief_activated_today":"text","v1_behavior_caught":"text","v1_inner_talk_detected":"Y/N","v1_inner_talk_content":"text","v1_feeling_activated":"text","what_triggered_v1_feeling":"text","reason_underneath_v1":"text","how_long_v1_feeling_lasted":"text","named_before_escaping":"Y/N","v1_behavior_it_drove":"text","v1_won_or_returned":"V1 won/Returned to V2/Partial","v2_moment_today":"text","acted_with_certainty":"Y/N","said_what_needed_to_be_said":"Y/N","spoke_loud_with_control":"Y/N","avoided_people_pleasing":"Y/N","took_action_instead_of_planning":"Y/N","patient_score_life":0,"fearless_score_life":0,"disciplined_score_life":0,"consistent_score_life":0,"focus_quality":"Locked in/Drifting/Scattered","distraction_level":0,"impulsivity_outside_trading":"Y/N","productive_hours":0,"dopamine_seeking":"Y/N","dopamine_seeking_looked_like":"text","planned_work_done":"Y/N","morning_ritual_done":"Y/N","journaling_done":"Y/N","alarmy_ritual_done":"Y/N","screen_time_controlled":"Y/N","alcohol_today":"Y/N","daily_goal":"text","daily_goal_hit":"Y/N","why_goal_not_hit":"text","job_search_progress":"text","one_thing_moved_forward":"text","one_thing_avoided":"text","relationship_quality":"Good/Neutral/Strained","disruption_external":"Y/N","how_responded_to_disruption":"V1/V2","isolation_level":"Connected/Neutral/Isolated","gratitude":"text","stoic_morning_statement_read":"Y/N","acted_from_fear_of_judgment":"Y/N","made_someone_comfortable_at_own_expense":"Y/N","explained_when_silence_enough":"Y/N","non_reactive_response_used":"Y/N","somatic_practice_done":"Y/N","v1_body_state_before":"text","v2_body_state_after":"text","state_shift_achieved":"Y/N","identity_rehearsal_done":"Y/N","rehearsal_real_or_performed":"Real/Performed/Partial","body_present_rehearsal":"Y/N","v1_belief_resistant_to_identity_statement":"text","defence_mechanism_blocked_rehearsal":"text","shadow_question_answered":"Y/N","what_discovered_shadow":"text","escape_named_instead_of_taken":"Y/N","what_was_underneath_escape":"text","assumption_behind_escape":"text","secondary_gain_of_escape":"text","defence_mechanism_during_escape":"text","this_weeks_micro_action":"text","micro_action_done":"Y/N","resistance_level":"None/Low/Medium/High","sunday_checkin_done":"Y/N","pattern_claude_identified":"text","uncomfortable_truth_this_week":"text","next_week_single_focus":"text","signal_recognized_outside_trading":"Y/N","five_second_rule_applied_life":"Y/N","five_second_rule_window":"text","values_gap_today":"Y/N","values_gap_description":"text","unmet_need_reactive_moment":"text","window_of_tolerance_daily":0,"one_win_behavioral":"text","one_correction_tomorrow":"text","how_close_to_him_today":0}\n\nTranscript:';
+
+// ── COLUMN MAPS ───────────────────────────────────────────────────────────────
+var T1H=["Date","Day","Wake Up Time","Sleep Hours","Sleep Quality","Alcohol Previous Night","Alcohol Amount","Feeling/Emotional State","Energy Level","Supplement/ADHD Med","Financial Stress Level","Survival Pressure Felt","Cold Water Done","Light Exercise Done","Visualization/Meditation Done","Physiological Sighs Done","Body Scan Done","Body Scan Result","Identity Statement Read","Alarmy Ritual Completed","Music/Playlist On","Which Version Today","V1 Belief Active Morning","V2 State Accessed","Nervous System State","Inner Talk Morning","Today's Single Behavioral Goal","Weekly Main Goal","Dopamine Bridge Planned","90 Min Timer Set","Account Type Today","Current Profit Target %","Above 60% Profit Target","Circuit Breaker Reviewed","Stoic Morning Statement Read","Previous Day Candle","Open Scenario","QQQ vs 2-Day AVWAP","QQQ Bias","Market Short Term Trend","Market Long Term Trend","Mag7 Strength","Futures Direction","Key Levels NQ","Possible Entry Location","Main Plan","Entry Type","Entry Trigger","Stop Level","Invalidation","Two Scenarios","Max Loss Today","Max Trades Today","Levels Marked on Chart","Notes","Active V1 Belief Entering Session","Window of Tolerance Score Open"];
+var T1K=["date","day","wake_up_time","sleep_hours","sleep_quality","alcohol_previous_night","alcohol_amount","feeling_emotional_state","energy_level","supplement_adhd_med","financial_stress_level","survival_pressure_felt","cold_water_done","light_exercise_done","visualization_meditation_done","physiological_sighs_done","body_scan_done","body_scan_result","identity_statement_read","alarmy_ritual_completed","music_playlist_on","which_version_today","v1_belief_active_morning","v2_state_accessed","nervous_system_state","inner_talk_morning","todays_single_behavioral_goal","weekly_main_goal","dopamine_bridge_planned","timer_90min_set","account_type_today","current_profit_target_pct","above_60pct_profit_target","circuit_breaker_reviewed","stoic_morning_statement_read","previous_day_candle","open_scenario","qqq_vs_2day_avwap","qqq_bias","market_short_term_trend","market_long_term_trend","mag7_strength","futures_direction","key_levels_nq","possible_entry_location","main_plan","entry_type","entry_trigger","stop_level","invalidation","two_scenarios","max_loss_today","max_trades_today","levels_marked_on_chart","notes","active_v1_belief_entering_session","window_of_tolerance_score_open"];
+var T2H=["Date","Time of Entry","Trade Type","Trade Number Today","Account Type","Profit Target % Before Trade","Above 60% Threshold","QQQ vs 2-Day AVWAP","Directional Bias","Bias Confirmed Before Entry","Entry Level Type","Planned Entry","Actual Entry","Entry Deviation Points","Add-On Level","Planned Stop","Actual Stop","Invalidation Level","Target Level","Position Size First Entry","Did You Add On","Add-On Size","Total Position Size","Size Increased After Loss","Exit Level","P&L","Exit Reason","Pre-Trade Body Check Done","Mouse Gate Used","Verbal Narration Used","Back Position Before Entry","5-Second Rule Used","5-Second Rule What Happened","Followed Plan","What Changed","Hesitated at Valid Setup","Hesitation Duration","Entered Before Confirmation","Exited Before Target","Held as Long as Planned","Stop Moved","Added Within Risk Params","Zombie Mode Entry","Recovery Trade","Random Candle Entry","Idea Properly Invalidated","Which Version Entered","V1 Inner Talk Detected","V1 Inner Talk Content","V2 Inner Talk Used","V2 Inner Talk Content","Destruction Pattern Activated","Chart Event Triggered V1","Thought That Followed","Feeling That Followed","V1 Behavior Resulted","Time Between Trigger and Action","Moment of Choice Existed","What Interrupted It","V2 Response Next Time","V2 Thought Replacement","If-Then Goes On Card","Emotion Before Entry","Emotion During Trade","Emotion At Exit","Tilt Stage During Trade","Body Sensation","Cortisol Spike","FOMO Present","Survival Pressure During Trade","Interruption Used","Was Above 60% When Loss","Circuit Breaker Triggered","Platform Closed Immediately","Waited Full 30 Min","Returned and Traded Again","Lesson","What I'd Do Differently","Notes","Defence Mechanism During Trade","Defence Protecting From","Secondary Gain This Trade","Unmet Need Underneath"];
+var T2K=["date","time_of_entry","trade_type","trade_number_today","account_type","profit_target_pct_before_trade","above_60pct_threshold","qqq_vs_2day_avwap","directional_bias","bias_confirmed_before_entry","entry_level_type","planned_entry","actual_entry","entry_deviation_points","addon_level","planned_stop","actual_stop","invalidation_level","target_level","position_size_first_entry","did_you_add_on","addon_size","total_position_size","size_increased_after_loss","exit_level","pnl","exit_reason","pre_trade_body_check_done","mouse_gate_used","verbal_narration_used","back_position_before_entry","five_second_rule_used","five_second_rule_what_happened","followed_plan","what_changed","hesitated_at_valid_setup","hesitation_duration","entered_before_confirmation","exited_before_target","held_as_long_as_planned","stop_moved","added_within_risk_params","zombie_mode_entry","recovery_trade","random_candle_entry","idea_properly_invalidated","which_version_entered","v1_inner_talk_detected","v1_inner_talk_content","v2_inner_talk_used","v2_inner_talk_content","destruction_pattern_activated","chart_event_triggered_v1","thought_that_followed","feeling_that_followed","v1_behavior_resulted","time_between_trigger_and_action","moment_of_choice_existed","what_interrupted_it","v2_response_next_time","v2_thought_replacement","ifthen_goes_on_card","emotion_before_entry","emotion_during_trade","emotion_at_exit","tilt_stage_during_trade","body_sensation","cortisol_spike","fomo_present","survival_pressure_during_trade","interruption_used","was_above_60pct_when_loss","circuit_breaker_triggered","platform_closed_immediately","waited_full_30_min","returned_and_traded_again","lesson","what_id_do_differently","notes","defence_mechanism_during_trade","defence_protecting_from","secondary_gain_this_trade","unmet_need_underneath"];
+var T3H=["Date","Account Type","Total P&L","Profit Target % EOD","Total Trades","Planned Trades","Unplanned Trades","Plan Adherence Score","Behavioral Score","Session Duration","Binary Score","Consecutive Rule-Following Days","Streak Broken Today","Why Streak Broken","P1 Early Entries","P2 Skipped After Loss","P3 Exited Early","P4 Zombie Trades","Destruction Pattern Activated","Destruction Sequence Trigger","Where Caught in Sequence","Size Increased After Loss","Recovery Trades Count","Was Above 60% During Session","Circuit Breaker Triggered","Honored Circuit Breaker","What Happened After Circuit Breaker","Which Version Dominated","V1 Beliefs Activated Today","V1 Inner Talk Caught","V1 Inner Talk Content","V2 Behaviors Executed","Patient Score","Fearless Score","Disciplined Score","Consistent Score","Identity Consistency Score","Gap V1 V2 Today","Most Common Chart Trigger Today","Most Common V1 Thought Today","If-Then Written on Card","Back Position Held","Mouse Gate Consistent","Verbal Narration Used","20-Min Alarm Used","Pre-Trade Body Check %","Interruption Used Session","5-Second Rule When Signal","What Went Well","Best Trade","Worst Trade","Most In Control Moment","Most Out of Control Moment","Behavior to Carry Tomorrow","Tomorrow's Single Adjustment","Replay Moment","Attention Drift Count","NS Recovery Breath Count","Earliest Signal Caught","Tilt Stage First Noticed","Dopamine Seeking Session","Cortisol Spike After Loss","Recovered From Loss","Attention Quality","Dopamine Bridge Used","Survival Pressure Affected Trading","Financial Stress Impact","Evening Training Done","Body Scan Done Evening","Tilt Interruption Rehearsal Done","Tomorrow's If-Then Rule","One Win Today Behavioral","One Correction Tomorrow","Overall Emotional State","Energy Level EOD","Notes","Primary Defence Mechanism Today","Secondary Gain Worst Behavior","Result Confirmed V1 Belief","Win Accepted or Dismissed"];
+var T3K=["date","account_type","total_pnl","profit_target_pct_eod","total_trades","planned_trades","unplanned_trades","plan_adherence_score","behavioral_score","session_duration","binary_score","consecutive_rule_following_days","streak_broken_today","why_streak_broken","p1_early_entries_count","p2_skipped_after_loss_count","p3_exited_early_count","p4_zombie_trades_count","destruction_pattern_activated","destruction_sequence_trigger","where_caught_in_sequence","size_increased_after_loss","recovery_trades_count","was_above_60pct_during_session","circuit_breaker_triggered","honored_circuit_breaker","what_happened_after_circuit_breaker","which_version_dominated","v1_beliefs_activated_today","v1_inner_talk_caught","v1_inner_talk_content","v2_behaviors_executed","patient_score","fearless_score","disciplined_score","consistent_score","identity_consistency_score","gap_v1_v2_today","most_common_chart_trigger_today","most_common_v1_thought_today","ifthen_written_on_card","back_position_held","mouse_gate_consistent","verbal_narration_used","alarm_20min_used","pre_trade_body_check_pct","interruption_used_session","five_second_rule_when_signal","what_went_well","best_trade","worst_trade","most_in_control_moment","most_out_of_control_moment","behavior_to_carry_tomorrow","tomorrows_single_adjustment","replay_moment","attention_drift_count","ns_recovery_breath_count","earliest_signal_caught","tilt_stage_first_noticed","dopamine_seeking_session","cortisol_spike_after_loss","recovered_from_loss","attention_quality","dopamine_bridge_used","survival_pressure_affected_trading","financial_stress_impact","evening_training_done","body_scan_done_evening","tilt_interruption_rehearsal_done","tomorrows_ifthen_rule","one_win_today_behavioral","one_correction_tomorrow","overall_emotional_state","energy_level_eod","notes","primary_defence_mechanism_today","secondary_gain_worst_behavior","result_confirmed_v1_belief","win_accepted_or_dismissed"];
+var T4H=["Date","Overall V2 Score","Which Version Dominated Life","Acted How Supposed To","Did What Supposed To","Binary Score","Wake Up State","Sleep Hours","Sleep Quality","Alcohol Last Night","Alcohol Amount","Exercise Done","Exercise Type","Nutrition Quality","Supplement/ADHD Med","Energy Level","Cold Exposure Done","Mood Score","Mood Type","Dominant Feeling Today","Feeling Duration","What Triggered Feeling","Anxiety Level","Financial Stress Level","Survival Pressure Felt","Primary Feeling Today","Stress Source","Emotional Trigger Today","How Handled Emotional Trigger","V1 Belief Activated Today","V1 Behavior Caught","V1 Inner Talk Detected","V1 Inner Talk Content","V1 Feeling Activated","What Triggered V1 Feeling","Reason Underneath V1","How Long V1 Feeling Lasted","Named Before Escaping","V1 Behavior It Drove","V1 Won or Returned","V2 Moment Today","Acted With Certainty","Said What Needed To Be Said","Spoke Loud With Control","Avoided People Pleasing","Took Action Instead of Planning","Patient Score Life","Fearless Score Life","Disciplined Score Life","Consistent Score Life","Focus Quality","Distraction Level","Impulsivity Outside Trading","Productive Hours","Dopamine Seeking","Dopamine Seeking Looked Like","Planned Work Done","Morning Ritual Done","Journaling Done","Alarmy Ritual Done","Screen Time Controlled","Alcohol Today","Daily Goal","Daily Goal Hit","Why Goal Not Hit","Job Search Progress","One Thing Moved Forward","One Thing Avoided","Relationship Quality","Disruption External","How Responded to Disruption","Isolation Level","Gratitude","Stoic Morning Statement Read","Acted From Fear of Judgment","Made Someone Comfortable at Own Expense","Explained When Silence Enough","Non-Reactive Response Used","Somatic Practice Done","V1 Body State Before","V2 Body State After","State Shift Achieved","Identity Rehearsal Done","Rehearsal Real or Performed","Body Present Rehearsal","V1 Belief Resistant to Identity Statement","Defence Mechanism Blocked Rehearsal","Shadow Question Answered","What Discovered Shadow","Escape Named Instead of Taken","What Was Underneath Escape","Assumption Behind Escape","Secondary Gain of Escape","Defence Mechanism During Escape","This Week's Micro-Action","Micro-Action Done","Resistance Level","Sunday Check-In Done","Pattern Claude Identified","Uncomfortable Truth This Week","Next Week Single Focus","Signal Recognized Outside Trading","5-Second Rule Applied Life","5-Second Rule Window","Values Gap Today","Values Gap Description","Unmet Need Reactive Moment","Window of Tolerance Daily","One Win Behavioral","One Correction Tomorrow","How Close to Him Today"];
+var T4K=["date","overall_v2_score","which_version_dominated_life","acted_how_supposed_to","did_what_supposed_to","binary_score","wake_up_state","sleep_hours","sleep_quality","alcohol_last_night","alcohol_amount","exercise_done","exercise_type","nutrition_quality","supplement_adhd_med","energy_level","cold_exposure_done","mood_score","mood_type","dominant_feeling_today","feeling_duration","what_triggered_feeling","anxiety_level","financial_stress_level","survival_pressure_felt","primary_feeling_today","stress_source","emotional_trigger_today","how_handled_emotional_trigger","v1_belief_activated_today","v1_behavior_caught","v1_inner_talk_detected","v1_inner_talk_content","v1_feeling_activated","what_triggered_v1_feeling","reason_underneath_v1","how_long_v1_feeling_lasted","named_before_escaping","v1_behavior_it_drove","v1_won_or_returned","v2_moment_today","acted_with_certainty","said_what_needed_to_be_said","spoke_loud_with_control","avoided_people_pleasing","took_action_instead_of_planning","patient_score_life","fearless_score_life","disciplined_score_life","consistent_score_life","focus_quality","distraction_level","impulsivity_outside_trading","productive_hours","dopamine_seeking","dopamine_seeking_looked_like","planned_work_done","morning_ritual_done","journaling_done","alarmy_ritual_done","screen_time_controlled","alcohol_today","daily_goal","daily_goal_hit","why_goal_not_hit","job_search_progress","one_thing_moved_forward","one_thing_avoided","relationship_quality","disruption_external","how_responded_to_disruption","isolation_level","gratitude","stoic_morning_statement_read","acted_from_fear_of_judgment","made_someone_comfortable_at_own_expense","explained_when_silence_enough","non_reactive_response_used","somatic_practice_done","v1_body_state_before","v2_body_state_after","state_shift_achieved","identity_rehearsal_done","rehearsal_real_or_performed","body_present_rehearsal","v1_belief_resistant_to_identity_statement","defence_mechanism_blocked_rehearsal","shadow_question_answered","what_discovered_shadow","escape_named_instead_of_taken","what_was_underneath_escape","assumption_behind_escape","secondary_gain_of_escape","defence_mechanism_during_escape","this_weeks_micro_action","micro_action_done","resistance_level","sunday_checkin_done","pattern_claude_identified","uncomfortable_truth_this_week","next_week_single_focus","signal_recognized_outside_trading","five_second_rule_applied_life","five_second_rule_window","values_gap_today","values_gap_description","unmet_need_reactive_moment","window_of_tolerance_daily","one_win_behavioral","one_correction_tomorrow","how_close_to_him_today"];
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+var G = {
+  mode: null,
+  results: null
+};
+
+function lget(k,d){ try{ return localStorage.getItem(k)||d; }catch(e){ return d; } }
+function lset(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
+
+// ── HELPERS ───────────────────────────────────────────────────────────────────
+function show(page) {
+  document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); });
+  document.getElementById('p-'+page).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+function showErr(id, msg) {
+  var el = document.getElementById(id);
+  if(el) el.innerHTML = msg ? '<div class="err">'+msg+'</div>' : '';
+}
+
+function setLoading(title, sub, note) {
+  document.getElementById('proc-title').textContent = title || 'Processing…';
+  document.getElementById('proc-sub').textContent = sub || '';
+  document.getElementById('proc-note').textContent = note || '';
+}
+
+function updateWC() {
+  var t = document.getElementById('transcript');
+  if(!t) return;
+  var w = t.value.trim().split(/\s+/).filter(function(x){return x;}).length;
+  document.getElementById('wc').textContent = w + ' words';
+}
+
+// ── NAVIGATION ────────────────────────────────────────────────────────────────
+function goMode() {
+  var ak = document.getElementById('ak').value.trim();
+  var sid = document.getElementById('sid').value.trim();
+  var gk = document.getElementById('gk').value.trim();
+  if(!ak||!sid||!gk){ showErr('setup-err','Please fill in all 3 fields.'); return; }
+  lset('ak',ak); lset('sid',sid); lset('gk',gk);
+  show('mode');
+}
+
+function setMode(m) {
+  G.mode = m;
+  var colors = {premarket:'#00d4ff',tradelog:'#ff9500',eod:'#00e676'};
+  var labels = {premarket:'Pre-Market Prep',tradelog:'Trade Log',eod:'End of Day'};
+  var c = colors[m]; var l = labels[m];
+  var tag = document.getElementById('mode-tag');
+  tag.innerHTML = '<span style="display:inline-block;background:'+c+'22;color:'+c+';border:1px solid '+c+'44;border-radius:5px;padding:2px 8px;font-size:10px;letter-spacing:0.08em;margin-right:10px">'+l+'</span><span style="font-size:12px;color:#5555aa">Speak or type freely</span>';
+  var btn = document.getElementById('submit-btn');
+  btn.style.background = c;
+  var ta = document.getElementById('transcript');
+  ta.value = '';
+  document.getElementById('wc').textContent = '0 words';
+  showErr('input-err','');
+  show('input');
+}
+
+function logAgain() {
+  document.getElementById('transcript').value = '';
+  document.getElementById('wc').textContent = '0 words';
+  showErr('input-err','');
+  show('input');
+}
+
+// ── API CALLS ─────────────────────────────────────────────────────────────────
+function callClaude(ak, prompt, transcript) {
+  return fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': ak,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true'
+    },
+    body: JSON.stringify({
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: 2000,
+      messages: [{ role: 'user', content: prompt + '\n' + transcript }]
+    })
+  }).then(function(r){ return r.json(); }).then(function(data){
+    if(data.error) throw new Error('Claude: ' + data.error.message);
+    var t = (data.content && data.content[0] && data.content[0].text) || '';
+    t = t.replace(/```json|```/g,'').trim();
+    return JSON.parse(t);
+  });
+}
+
+function writeRow(sid, gk, tab, row, vals) {
+  var range = encodeURIComponent(tab+'!A'+row);
+  var url = 'https://sheets.googleapis.com/v4/spreadsheets/'+sid+'/values/'+range+'?valueInputOption=RAW&key='+gk;
+  return fetch(url, {
+    method: 'PUT',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({values:[vals]})
+  }).then(function(r){
+    if(!r.ok) return r.json().then(function(e){ throw new Error('Sheets: '+(e.error&&e.error.message||'write failed')); });
+  });
+}
+
+function writeTab(sid, gk, tab, headers, keys, data) {
+  var range = encodeURIComponent(tab+'!A:A');
+  return fetch('https://sheets.googleapis.com/v4/spreadsheets/'+sid+'/values/'+range+'?key='+gk)
+    .then(function(r){ return r.json(); })
+    .then(function(cd){
+      if(cd.error) throw new Error('Sheets check: '+cd.error.message);
+      var rows = (cd.values && cd.values.length) || 0;
+      var vals = keys.map(function(k){ var v=data[k]; return (v===null||v===undefined)?'':String(v); });
+      if(rows===0){
+        return writeRow(sid,gk,tab,1,headers)
+          .then(function(){ return new Promise(function(r){setTimeout(r,600);}); })
+          .then(function(){ return writeRow(sid,gk,tab,2,vals); });
+      } else {
+        return writeRow(sid,gk,tab,rows+1,vals);
+      }
+    }).then(function(){ return {keys:keys,headers:headers,data:data}; });
+}
+
+// ── SUBMIT ────────────────────────────────────────────────────────────────────
+function doSubmit() {
+  var transcript = document.getElementById('transcript').value.trim();
+  if(!transcript){ return; }
+  var ak = lget('ak',''); var sid = lget('sid',''); var gk = lget('gk','');
+  if(!ak||!sid||!gk){ showErr('input-err','Missing credentials — go to Setup.'); return; }
+
+  show('processing');
+  var mode = G.mode;
+  var colors = {premarket:'#00d4ff',tradelog:'#ff9500',eod:'#00e676'};
+
+  document.getElementById('proc-title').style.color = colors[mode];
+
+  var promise;
+  if(mode==='premarket'){
+    setLoading('Extracting pre-market fields…','Sending to Claude Haiku','');
+    promise = callClaude(ak, PM_PROMPT, transcript).then(function(d){
+      setLoading('Writing to Google Sheets…','Pre-Market Prep tab','');
+      return writeTab(sid,gk,'Pre-Market Prep',T1H,T1K,d).then(function(r){
+        return {'Pre-Market Prep':r};
+      });
+    });
+  } else if(mode==='tradelog'){
+    setLoading('Extracting trade fields…','Sending to Claude Haiku','');
+    promise = callClaude(ak, TL_PROMPT, transcript).then(function(d){
+      setLoading('Writing to Google Sheets…','Trade Log tab','');
+      return writeTab(sid,gk,'Trade Log',T2H,T2K,d).then(function(r){
+        return {'Trade Log':r};
+      });
+    });
+  } else {
+    setLoading('Extracting EOD session data…','Call 1 of 2','EOD takes ~20 seconds — 2 Claude calls + 2 Sheets writes');
+    var d3,d4;
+    promise = callClaude(ak, E3_PROMPT, transcript).then(function(d){
+      d3=d;
+      setLoading('Extracting life & identity data…','Call 2 of 2','');
+      return callClaude(ak, E4_PROMPT, transcript);
+    }).then(function(d){
+      d4=d;
+      if(!d4.date&&d3.date) d4.date=d3.date;
+      setLoading('Writing EOD Debrief tab…','Sheets write 1 of 2','');
+      return writeTab(sid,gk,'EOD Debrief',T3H,T3K,d3);
+    }).then(function(r3){
+      setLoading('Writing Daily Life & Identity tab…','Sheets write 2 of 2','');
+      return new Promise(function(res){setTimeout(res,500);}).then(function(){
+        return writeTab(sid,gk,'Daily Life & Identity',T4H,T4K,d4).then(function(r4){
+          return {'EOD Debrief':r3,'Daily Life & Identity':r4};
+        });
+      });
+    });
+  }
+
+  promise.then(function(results){
+    G.results = results;
+    var ml={premarket:'Pre-Market Prep',tradelog:'Trade Log',eod:'End of Day'};
+    document.getElementById('confirm-sub').textContent = ml[mode]+' · '+new Date().toLocaleTimeString();
+    var again = document.getElementById('again-btn');
+    again.style.background = colors[mode];
+    var html = '';
+    for(var tab in results){
+      var info = results[tab];
+      var filled = info.keys.filter(function(k){ var v=info.data[k]; return v!==null&&v!==undefined&&v!==''; });
+      var rows = filled.slice(0,20).map(function(k){
+        var hi = info.keys.indexOf(k);
+        var label = info.headers[hi]||k;
+        return '<div class="fr"><div class="fk">'+label+'</div><div class="fv">'+String(info.data[k])+'</div></div>';
+      }).join('');
+      var more = filled.length>20 ? '<div style="font-size:10px;color:#333355;text-align:center;padding-top:10px">+ '+(filled.length-20)+' more fields written</div>' : '';
+      html += '<div class="card"><div style="display:flex;justify-content:space-between;margin-bottom:12px"><div style="font-size:11px;font-weight:700;color:#7777bb;letter-spacing:0.1em;text-transform:uppercase">'+tab+'</div><span style="background:#00e67622;color:#00e676;border:1px solid #00e67644;border-radius:5px;padding:2px 8px;font-size:10px">'+filled.length+' fields</span></div>'+rows+more+'</div>';
+    }
+    document.getElementById('results').innerHTML = html;
+    show('confirm');
+  }).catch(function(e){
+    showErr('input-err', e.message);
+    show('input');
+  });
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+document.getElementById('ak').value = lget('ak','');
+document.getElementById('sid').value = lget('sid','');
+document.getElementById('gk').value = lget('gk','');
+</script>
+</body>
+</html>
