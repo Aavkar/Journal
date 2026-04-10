@@ -11,188 +11,136 @@
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 <style>
+:root{
+  --bg:#181d2a;--bg2:#1f2535;--bg3:#262e40;--bg4:#2d364a;
+  --border:#2e3a50;--border2:#38485e;
+  --amber:#d4956a;--amber-l:#e8b48e;--amber-d:#a8704e;
+  --teal:#4ecdc4;--red:#e07070;--purple:#9b8ed4;--green:#5ec490;
+  --text1:#e8e4dc;--text2:#a8afc0;--text3:#5a6475;
+}
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;overflow:hidden}
-body{background:#040810;color:#e0f0f8;font-family:monospace;-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--text1);font-family:Georgia,serif;-webkit-text-size-adjust:100%}
 #root{height:100vh;overflow:hidden}
-::-webkit-scrollbar{width:4px}
-::-webkit-scrollbar-track{background:transparent}
-::-webkit-scrollbar-thumb{background:#1e2a3a;border-radius:4px}
-textarea{font-family:monospace;color:#c8d8e8;background:#050a0f;border:1px solid #1a2535;border-radius:10px;padding:14px 46px 14px 14px;font-size:13px;line-height:1.8;resize:none;outline:none;width:100%;-webkit-appearance:none}
-textarea::placeholder{color:#1e3040}
-input{-webkit-appearance:none}
-button{cursor:pointer;-webkit-tap-highlight-color:transparent}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px}
+textarea{font-family:Georgia,serif;font-size:15px;color:var(--text1);background:var(--bg);border:1px solid var(--border2);border-radius:10px;padding:16px 48px 16px 16px;line-height:1.9;resize:none;outline:none;width:100%}
+textarea::placeholder{color:var(--text3)}
+button{cursor:pointer;-webkit-tap-highlight-color:transparent;font-family:Georgia,serif}
+.btn-nav{background:var(--bg3);border:1px solid var(--border2);color:var(--amber-l);border-radius:10px;padding:10px 22px;font-size:14px;letter-spacing:1px;font-family:monospace}
+.section-label{font-size:10px;letter-spacing:2.5px;font-family:monospace;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid var(--border);opacity:.95}
+.guide-item{display:flex;align-items:center;gap:9px;margin-bottom:7px}
+.g-dot-f{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.g-dot-e{width:4px;height:4px;border-radius:50%;background:var(--border2);flex-shrink:0;margin-left:1px}
+.g-txt{font-size:13px;line-height:1.4;font-family:monospace}
+.g-hi{color:var(--text1)}.g-lo{color:var(--text3)}
+.btn-cta{background:linear-gradient(135deg,var(--amber-d),var(--amber));border:none;border-radius:14px;color:#fff;font-size:15px;font-weight:700;letter-spacing:3px;font-family:monospace;padding:20px 56px;box-shadow:0 4px 24px rgba(212,149,106,.2)}
 </style>
 </head>
 <body>
 <div id="root"></div>
 <script type="text/babel">
 const {useState,useEffect}=React;
+const h=React.createElement;
 
-const STARS=Array.from({length:55},(_,i)=>({id:i,x:Math.random()*100,y:Math.random()*100,s:Math.random()*1.6+0.3,o:Math.random()*0.4+0.15}));
+const STARS=Array.from({length:45},(_,i)=>({id:i,x:Math.random()*100,y:Math.random()*100,s:Math.random()*1.5+0.4,o:Math.random()*0.2+0.07}));
+function Stars(){return h('div',{style:{position:'fixed',inset:0,pointerEvents:'none',zIndex:0}},STARS.map(s=>h('div',{key:s.id,style:{position:'absolute',left:s.x+'%',top:s.y+'%',width:s.s,height:s.s,borderRadius:'50%',background:'#b0b8cc',opacity:s.o}})));}
 
-const DEFAULT_QUOTES=[
+const QUOTES=[
   {id:1,text:"What gets measured gets managed. What gets journaled gets mastered.",author:"Peter Drucker — Adapted"},
   {id:2,text:"The undisciplined trader's biggest enemy is himself. The journal is the mirror.",author:"Mark Douglas"},
   {id:3,text:"Every trade is a lesson. Every journal entry is a weapon.",author:"Avkar"},
   {id:4,text:"Consistency is not about being perfect. It's about showing up the same way every day.",author:"Avkar"},
 ];
 
-// ── PRE-MARKET GUIDE (Tab 1) ─────────────────────────────────────────────────
-const PM_GUIDE=[
-  {section:"SLEEP & BODY",color:"#4dd9e0",dot:false,items:[
-    "Sleep hrs","Quality (poor/ok/good)","Alcohol?","Energy 1–10","Supplements?","ADHD med taken?"
-  ]},
-  {section:"RITUALS DONE",color:"#4dd9e0",dot:false,items:[
-    "Cold water?","Light exercise?","Visualization?","Body scan","Identity stmt read?","Alarm ritual done?","Music on?"
-  ]},
-  {section:"MENTAL STATE",color:"#ff5555",dot:true,items:[
-    "V1 or V2 today?","Inner talk type","Active V1 belief?","NS state 1 word","Financial stress 1–10","Survival pressure?","Ready to lose calmly?"
-  ]},
-  {section:"TODAY'S INTENTION",color:"#f0c040",dot:true,items:[
-    "One word intention","Session focus","V2 behaviour goal","What to avoid today","One rule to protect"
-  ]},
-  {section:"RISK PARAMETERS",color:"#ff5555",dot:false,items:[
-    "Max daily loss $","Profit target $","Max # trades","Max contracts","Hard cutoff time"
-  ]},
-  {section:"MARKET CONTEXT",color:"#a78bfa",dot:false,items:[
-    "Major news today?","Pre-mkt NQ move","Gap up / gap down","Overall trend bias","Correlated mkts check"
-  ]},
-  {section:"SETUP PLAN",color:"#4dd9e0",dot:false,items:[
-    "Primary setup today","Key support level","Key resistance level","Entry trigger","Confirmation signal","Invalidation level"
-  ]},
+const PM=[
+  {s:"SLEEP & BODY",c:"var(--teal)",d:false,i:["Sleep hrs","Quality (poor/ok/good)","Alcohol last night?","Energy 1–10","Supplements taken?","ADHD med taken?"]},
+  {s:"RITUALS DONE",c:"var(--teal)",d:false,i:["Cold water?","Light exercise?","Visualization?","Body scan done?","Identity stmt read?","Alarm ritual?","Music on?"]},
+  {s:"MENTAL STATE",c:"var(--red)",d:true,i:["V1 or V2 today?","Inner talk type","Active V1 belief?","Nervous system state","Financial stress 1–10","Survival pressure?","Ready to lose calmly?"]},
+  {s:"TODAY'S INTENTION",c:"var(--amber)",d:true,i:["One word intention","Session focus","V2 behaviour goal","What to avoid today","One rule to protect"]},
+  {s:"RISK PARAMETERS",c:"var(--red)",d:false,i:["Max daily loss $","Profit target $","Max # trades","Max contracts","Hard cutoff time"]},
+  {s:"MARKET CONTEXT",c:"var(--purple)",d:false,i:["Major news today?","Pre-mkt NQ move","Gap up / down","Overall trend bias","Correlated mkts"]},
+  {s:"SETUP PLAN",c:"var(--teal)",d:false,i:["Primary setup today","Key support level","Key resistance level","Entry trigger","Confirmation signal","Invalidation level"]},
 ];
-
-// ── TRADE LOG GUIDE (Tab 2) ──────────────────────────────────────────────────
-const TL_GUIDE=[
-  {section:"TRADE BASICS",color:"#4dd9e0",dot:false,items:[
-    "Time of entry","Instrument","Long or short","Entry price","Contracts / size","Setup name"
-  ]},
-  {section:"PRE-ENTRY CHECK",color:"#f0c040",dot:true,items:[
-    "Was signal confirmed?","Hesitation? Y/N","FOMO involved?","Chased entry?","V1 or V2 mindset?","Body feeling at entry"
-  ]},
-  {section:"EXECUTION QUALITY",color:"#4dd9e0",dot:false,items:[
-    "Entry quality 1–10","Followed exact plan?","Trigger type used","Initial SL placed?","Target set before entry?"
-  ]},
-  {section:"TRADE MANAGEMENT",color:"#ff5555",dot:true,items:[
-    "Moved SL too early?","Scaled out at target?","Added to position?","Exited early? Why?","Held through noise?"
-  ]},
-  {section:"EXIT",color:"#34d399",dot:false,items:[
-    "Exit time","Exit price","Gross P&L $","Exit reason","Target hit? Y/N","Slippage?"
-  ]},
-  {section:"POST-TRADE REVIEW",color:"#a78bfa",dot:true,items:[
-    "Grade A / B / C / D","Rule broken? Which?","Best moment this trade","What to fix next time","Emotion at exit","Repeat this setup?"
-  ]},
+const TL=[
+  {s:"TRADE BASICS",c:"var(--teal)",d:false,i:["Time of entry","Instrument","Long or short","Entry price","Contracts / size","Setup name"]},
+  {s:"PRE-ENTRY CHECK",c:"var(--amber)",d:true,i:["Signal confirmed?","Hesitation? Y/N","FOMO involved?","Chased entry?","V1 or V2 mindset?","Body feeling at entry"]},
+  {s:"EXECUTION",c:"var(--teal)",d:false,i:["Entry quality 1–10","Followed exact plan?","Trigger type used","Initial SL placed?","Target set before entry?"]},
+  {s:"TRADE MANAGEMENT",c:"var(--red)",d:true,i:["Moved SL too early?","Scaled out at target?","Added to position?","Exited early? Why?","Held through noise?"]},
+  {s:"EXIT",c:"var(--green)",d:false,i:["Exit time","Exit price","Gross P&L $","Exit reason","Target hit? Y/N","Slippage?"]},
+  {s:"POST-TRADE",c:"var(--purple)",d:true,i:["Grade A/B/C/D","Rule broken? Which?","Best moment","What to fix","Emotion at exit","Repeat this setup?"]},
 ];
-
-// ── END OF DAY GUIDE (Tabs 3 + 4) ───────────────────────────────────────────
-const EOD_GUIDE=[
-  // TAB 3 — Performance + Trade Review
-  {section:"SESSION STATS (TAB 3)",color:"#4dd9e0",dot:false,items:[
-    "Start time / end time","# trades taken","# winners / # losers","Gross P&L $","Commissions / fees","Net P&L $","Win rate %"
-  ]},
-  {section:"RISK COMPLIANCE",color:"#ff5555",dot:false,items:[
-    "Hit daily stop? Y/N","Exceeded trade limit?","Largest single loss $","Largest single win $","Max drawdown today $","Cutoff respected?"
-  ]},
-  {section:"BEST TRADE TODAY",color:"#34d399",dot:true,items:[
-    "Setup name","What worked","Execution grade","P&L this trade","Could have held longer?","Repeat this?"
-  ]},
-  {section:"WORST TRADE TODAY",color:"#ff5555",dot:true,items:[
-    "Setup name","What went wrong","Was it in the plan?","P&L this trade","Avoidable? How?","Rule broken?"
-  ]},
-  {section:"PATTERN REVIEW",color:"#a78bfa",dot:false,items:[
-    "Common mistake today","Best setup type today","Overtraded? Y/N","Revenge trade? Y/N","Time of best trades","Time of worst trades"
-  ]},
-  // TAB 4 — Psychology + Tomorrow
-  {section:"EMOTIONAL ARC (TAB 4)",color:"#f0c040",dot:true,items:[
-    "Emotional state at open","Peak emotion today","Lowest point today","State at close","Overall arc: rising/falling"
-  ]},
-  {section:"V1 AUDIT",color:"#ff5555",dot:true,items:[
-    "# V1 moments today","Main V1 trigger","Cost of V1 decisions $","Recovery speed (fast/slow/none)","V1 pattern I keep repeating","V2 response I used"
-  ]},
-  {section:"BODY & PRESENCE",color:"#4dd9e0",dot:false,items:[
-    "Chest tension level 1–10","Breathing quality","Felt present or scattered?","Physical energy level","Did body signal danger?"
-  ]},
-  {section:"IDENTITY CHECK",color:"#a78bfa",dot:true,items:[
-    "Traded like V2 overall?","Closest V2 moment today","Biggest gap to V2","Identity statement still true?","One word: who was I today?"
-  ]},
-  {section:"LESSONS & GROWTH",color:"#34d399",dot:true,items:[
-    "#1 lesson today","Pattern I now see","Aha moment if any","What I'll do differently","Am I improving? Y/N"
-  ]},
-  {section:"TOMORROW'S PLAN",color:"#f0c040",dot:false,items:[
-    "Reset ritual tonight","Focus adjustment","One thing to avoid","Energy plan for morning","Excited to trade tomorrow?"
-  ]},
+const EOD=[
+  {s:"SESSION STATS — TAB 3",c:"var(--teal)",d:false,i:["Start / end time","# trades taken","Winners / losers","Gross P&L $","Fees / commissions","Net P&L $","Win rate %"]},
+  {s:"RISK COMPLIANCE",c:"var(--red)",d:false,i:["Hit daily stop? Y/N","Exceeded trade limit?","Largest single loss $","Largest single win $","Max drawdown today $","Cutoff respected?"]},
+  {s:"BEST TRADE TODAY",c:"var(--green)",d:true,i:["Setup name","What worked","Execution grade","P&L this trade","Could have held longer?","Repeat this?"]},
+  {s:"WORST TRADE TODAY",c:"var(--red)",d:true,i:["Setup name","What went wrong","Was it in the plan?","P&L this trade","Avoidable? How?","Rule broken?"]},
+  {s:"PATTERN REVIEW",c:"var(--purple)",d:false,i:["Common mistake today","Best setup type","Overtraded? Y/N","Revenge trade? Y/N","Time of best trades","Time of worst trades"]},
+  {s:"EMOTIONAL ARC — TAB 4",c:"var(--amber)",d:true,i:["State at open","Peak emotion","Lowest point","State at close","Overall arc: rising/falling"]},
+  {s:"V1 AUDIT",c:"var(--red)",d:true,i:["# V1 moments","Main V1 trigger","Cost of V1 decisions $","Recovery speed","V1 pattern repeating?","V2 response used?"]},
+  {s:"BODY & PRESENCE",c:"var(--teal)",d:false,i:["Chest tension 1–10","Breathing quality","Present or scattered?","Physical energy","Body signalled danger?"]},
+  {s:"IDENTITY CHECK",c:"var(--purple)",d:true,i:["Traded like V2?","Closest V2 moment","Biggest gap to V2","Identity stmt still true?","One word: who was I?"]},
+  {s:"LESSONS & GROWTH",c:"var(--green)",d:true,i:["#1 lesson today","Pattern I now see","Aha moment?","What I'll do differently","Am I improving? Y/N"]},
+  {s:"TOMORROW'S PLAN",c:"var(--amber)",d:false,i:["Reset ritual tonight","Focus adjustment","One thing to avoid","Energy plan for morning","Excited to trade?"]},
 ];
-
-const GUIDES={premarket:PM_GUIDE,tradelog:TL_GUIDE,eod:EOD_GUIDE};
+const GUIDES={premarket:PM,tradelog:TL,eod:EOD};
 const META={
-  premarket:{label:"PRE-MARKET PREP",color:"#4dd9e0",sub:"Tab 1 · Before 9:30 AM"},
-  tradelog:{label:"TRADE LOG",color:"#f0c040",sub:"Tab 2 · After each trade"},
-  eod:{label:"END OF DAY",color:"#34d399",sub:"Tabs 3+4 · After session"},
+  premarket:{label:"PRE-MARKET PREP",color:"var(--teal)",sub:"Tab 1 · Before 9:30 AM"},
+  tradelog:{label:"TRADE LOG",color:"var(--amber)",sub:"Tab 2 · After each trade"},
+  eod:{label:"END OF DAY",color:"var(--green)",sub:"Tabs 3 + 4 · After session"},
 };
 
-// ── STARS ────────────────────────────────────────────────────────────────────
-function Stars(){
-  return React.createElement('div',{style:{position:'fixed',inset:0,pointerEvents:'none',zIndex:0}},
-    STARS.map(s=>React.createElement('div',{key:s.id,style:{position:'absolute',left:s.x+'%',top:s.y+'%',width:s.s,height:s.s,borderRadius:'50%',background:'#fff',opacity:s.o}}))
-  );
-}
-
-// ── GUIDE PANEL ──────────────────────────────────────────────────────────────
 function GuidePanel({guide}){
-  return React.createElement('div',{style:{width:210,flexShrink:0,overflowY:'auto',padding:'16px 8px 16px 18px',borderRight:'1px solid #0d1820',height:'100%'}},
-    guide.map(b=>React.createElement('div',{key:b.section,style:{marginBottom:16}},
-      React.createElement('div',{style:{color:b.color,fontSize:8,letterSpacing:2,marginBottom:6,opacity:0.9,paddingBottom:4,borderBottom:'1px solid #0d1820'}},b.section),
-      b.items.map(item=>React.createElement('div',{key:item,style:{display:'flex',alignItems:'center',gap:7,marginBottom:5}},
-        React.createElement('div',{style:{width:b.dot?5:3,height:b.dot?5:3,borderRadius:'50%',background:b.dot?b.color:'#1e3040',flexShrink:0,marginLeft:b.dot?0:1}}),
-        React.createElement('span',{style:{color:b.dot?'#ccdde8':'#4a6878',fontSize:11,lineHeight:1.4}},item)
+  return h('div',{style:{width:'25%',flexShrink:0,overflowY:'auto',padding:'18px 12px 18px 18px',borderRight:'1px solid var(--border)',height:'100%'}},
+    guide.map(b=>h('div',{key:b.s,style:{marginBottom:18}},
+      h('div',{className:'section-label',style:{color:b.c}},b.s),
+      b.i.map(item=>h('div',{key:item,className:'guide-item'},
+        b.d?h('div',{className:'g-dot-f',style:{background:b.c}}):h('div',{className:'g-dot-e'}),
+        h('span',{className:'g-txt '+(b.d?'g-hi':'g-lo')},item)
       ))
     ))
   );
 }
 
-// ── QUOTE MODAL ──────────────────────────────────────────────────────────────
 function QuoteModal({quotes,onSave,onClose}){
   const [list,setList]=useState(quotes.map(q=>({...q})));
   const [editId,setEditId]=useState(null);
   const [form,setForm]=useState({text:'',author:''});
   const save=()=>{
     if(!form.text.trim())return;
-    if(editId!==null){setList(list.map(q=>q.id===editId?{...q,...form}:q));}
-    else{setList([...list,{...form,id:Date.now()}]);}
+    if(editId!==null)setList(list.map(q=>q.id===editId?{...q,...form}:q));
+    else setList([...list,{...form,id:Date.now()}]);
     setEditId(null);setForm({text:'',author:''});
   };
-  return React.createElement('div',{style:{position:'fixed',inset:0,background:'rgba(0,0,0,0.9)',zIndex:300,display:'flex',alignItems:'center',justifyContent:'center',padding:16}},
-    React.createElement('div',{style:{background:'#0d1117',border:'1px solid #1e2a3a',borderRadius:14,padding:20,width:'100%',maxWidth:480,maxHeight:'85vh',overflowY:'auto'}},
-      React.createElement('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:18}},
-        React.createElement('span',{style:{color:'#4dd9e0',fontSize:10,letterSpacing:2}},'✦ MANAGE QUOTES'),
-        React.createElement('button',{onClick:onClose,style:{background:'none',border:'none',color:'#555',fontSize:20,padding:'0 4px'}},'✕')
+  return h('div',{style:{position:'fixed',inset:0,background:'rgba(12,15,22,.95)',zIndex:300,display:'flex',alignItems:'center',justifyContent:'center',padding:16}},
+    h('div',{style:{background:'var(--bg2)',border:'1px solid var(--border2)',borderRadius:16,padding:22,width:'100%',maxWidth:500,maxHeight:'86vh',overflowY:'auto'}},
+      h('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:18}},
+        h('span',{style:{color:'var(--amber)',fontFamily:'monospace',fontSize:13,letterSpacing:2}},'✦ MANAGE QUOTES'),
+        h('button',{onClick:onClose,style:{background:'none',border:'none',color:'var(--text3)',fontSize:22}},'✕')
       ),
-      list.map(q=>React.createElement('div',{key:q.id,style:{background:'#06090f',border:'1px solid #1a2535',borderRadius:10,padding:'10px 12px',marginBottom:8}},
-        React.createElement('div',{style:{color:'#aabbc8',fontStyle:'italic',fontSize:12,marginBottom:6,lineHeight:1.5}},'"'+q.text+'"'),
-        React.createElement('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'center'}},
-          React.createElement('span',{style:{color:'#4dd9e0',fontSize:10}},q.author?'— '+q.author:''),
-          React.createElement('div',{style:{display:'flex',gap:6}},
-            React.createElement('button',{onClick:()=>{setEditId(q.id);setForm({text:q.text,author:q.author||''});},style:{background:'none',border:'1px solid #1e2a3a',color:'#556677',borderRadius:6,padding:'2px 10px',fontSize:10}},'edit'),
-            React.createElement('button',{onClick:()=>setList(list.filter(x=>x.id!==q.id)),style:{background:'none',border:'1px solid #ff444440',color:'#f66',borderRadius:6,padding:'2px 10px',fontSize:10}},'×')
+      list.map(q=>h('div',{key:q.id,style:{background:'var(--bg)',border:'1px solid var(--border)',borderRadius:10,padding:'12px 14px',marginBottom:10}},
+        h('div',{style:{color:'var(--text2)',fontStyle:'italic',fontSize:14,marginBottom:7,lineHeight:1.6}},'"'+q.text+'"'),
+        h('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'center'}},
+          h('span',{style:{color:'var(--amber)',fontFamily:'monospace',fontSize:11}},q.author?'— '+q.author:''),
+          h('div',{style:{display:'flex',gap:8}},
+            h('button',{onClick:()=>{setEditId(q.id);setForm({text:q.text,author:q.author||''});},style:{background:'none',border:'1px solid var(--border2)',color:'var(--text3)',borderRadius:7,padding:'3px 12px',fontSize:12}},'edit'),
+            h('button',{onClick:()=>setList(list.filter(x=>x.id!==q.id)),style:{background:'none',border:'1px solid rgba(220,80,80,.3)',color:'var(--red)',borderRadius:7,padding:'3px 12px',fontSize:12}},'×')
           )
         )
       )),
-      React.createElement('div',{style:{marginTop:14,background:'#06090f',border:'1px solid #1a2535',borderRadius:10,padding:14}},
-        React.createElement('div',{style:{color:'#4dd9e0',fontSize:9,letterSpacing:1,marginBottom:10}},editId!==null?'EDITING':'+ ADD QUOTE'),
-        React.createElement('textarea',{value:form.text,onChange:e=>setForm({...form,text:e.target.value}),placeholder:'Quote text...',style:{height:56,marginBottom:8,fontSize:12,fontStyle:'italic',fontFamily:'Georgia,serif',background:'#080d14',border:'1px solid #1a2535',borderRadius:8,color:'#ccc',padding:'8px 10px',outline:'none',lineHeight:1.6,resize:'none',width:'100%'}}),
-        React.createElement('input',{value:form.author,onChange:e=>setForm({...form,author:e.target.value}),placeholder:'Author (optional)',style:{width:'100%',background:'#080d14',border:'1px solid #1a2535',borderRadius:8,color:'#4dd9e0',padding:'7px 10px',fontSize:11,fontFamily:'monospace',outline:'none'}}),
-        React.createElement('div',{style:{display:'flex',gap:8,marginTop:10}},
-          React.createElement('button',{onClick:save,style:{background:'linear-gradient(135deg,#0097a7,#00bcd4)',border:'none',borderRadius:8,color:'#000',padding:'7px 18px',fontSize:11,fontWeight:700,letterSpacing:1}},editId!==null?'UPDATE':'ADD'),
-          editId!==null&&React.createElement('button',{onClick:()=>{setEditId(null);setForm({text:'',author:''});},style:{background:'none',border:'1px solid #1e2a3a',borderRadius:8,color:'#666',padding:'7px 14px',fontSize:11}},'CANCEL')
+      h('div',{style:{marginTop:14,background:'var(--bg)',border:'1px solid var(--border)',borderRadius:10,padding:16}},
+        h('div',{style:{color:'var(--amber)',fontFamily:'monospace',fontSize:10,letterSpacing:1,marginBottom:10}},editId!==null?'EDITING':'+ ADD QUOTE'),
+        h('textarea',{value:form.text,onChange:ev=>setForm({...form,text:ev.target.value}),placeholder:'Quote text...',style:{height:60,marginBottom:8,fontSize:13,fontStyle:'italic',background:'var(--bg2)',border:'1px solid var(--border)',borderRadius:8,color:'var(--text1)',padding:'8px 10px',outline:'none',lineHeight:1.6,resize:'none',width:'100%',fontFamily:'Georgia,serif'}}),
+        h('input',{value:form.author,onChange:ev=>setForm({...form,author:ev.target.value}),placeholder:'Author (optional)',style:{width:'100%',background:'var(--bg2)',border:'1px solid var(--border)',borderRadius:8,color:'var(--amber-l)',padding:'8px 12px',fontSize:12,fontFamily:'monospace',outline:'none'}}),
+        h('div',{style:{display:'flex',gap:8,marginTop:12}},
+          h('button',{onClick:save,style:{background:'linear-gradient(135deg,var(--amber-d),var(--amber))',border:'none',borderRadius:8,color:'#fff',padding:'9px 20px',fontSize:13,fontWeight:700,letterSpacing:1}},editId!==null?'UPDATE':'ADD'),
+          editId!==null&&h('button',{onClick:()=>{setEditId(null);setForm({text:'',author:''});},style:{background:'none',border:'1px solid var(--border2)',borderRadius:8,color:'var(--text3)',padding:'9px 16px',fontSize:13}},'CANCEL')
         )
       ),
-      React.createElement('button',{onClick:()=>onSave(list),style:{width:'100%',marginTop:14,background:'linear-gradient(135deg,#0097a7,#00bcd4)',border:'none',borderRadius:10,color:'#000',padding:'12px',fontSize:12,fontWeight:700,letterSpacing:2}},'SAVE QUOTES')
+      h('button',{onClick:()=>onSave(list),style:{width:'100%',marginTop:14,background:'linear-gradient(135deg,var(--amber-d),var(--amber))',border:'none',borderRadius:10,color:'#fff',padding:'13px',fontFamily:'monospace',fontSize:13,fontWeight:700,letterSpacing:2}},'SAVE QUOTES')
     )
   );
 }
 
-// ── JOURNAL SCREEN ───────────────────────────────────────────────────────────
 function JournalScreen({session,onBack}){
   const [showGuide,setShowGuide]=useState(true);
   const [text,setText]=useState('');
@@ -200,81 +148,65 @@ function JournalScreen({session,onBack}){
   const meta=META[session];
   const guide=GUIDES[session];
   const words=text.trim()?text.trim().split(/\s+/).length:0;
-
-  const handleSave=async()=>{
-    setStatus('saving');
-    await new Promise(r=>setTimeout(r,1400));
-    setStatus('saved');
-    setTimeout(()=>setStatus('idle'),3000);
-  };
-
-  return React.createElement('div',{style:{display:'flex',flexDirection:'column',height:'100vh',position:'relative',zIndex:1,overflow:'hidden'}},
-    // Header
-    React.createElement('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'12px 18px',borderBottom:'1px solid #0d1820',flexShrink:0}},
-      React.createElement('div',{style:{display:'flex',alignItems:'center',gap:8}},
-        React.createElement('span',{style:{color:'#4dd9e0',fontSize:10,letterSpacing:2}},'✦ AVKAR · JOURNAL')
-      ),
-      React.createElement('button',{onClick:onBack,style:{background:'none',border:'1px solid #1e2a3a',color:'#4dd9e0',borderRadius:8,padding:'5px 14px',fontSize:10,letterSpacing:1}},'← BACK')
+  const handleSave=async()=>{setStatus('saving');await new Promise(r=>setTimeout(r,1400));setStatus('saved');setTimeout(()=>setStatus('idle'),3000);};
+  return h('div',{style:{display:'flex',flexDirection:'column',height:'100vh',position:'relative',zIndex:1,overflow:'hidden'}},
+    h('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'14px 22px',borderBottom:'1px solid var(--border)',flexShrink:0,background:'var(--bg2)'}},
+      h('span',{style:{color:'var(--amber)',fontFamily:'monospace',fontSize:14,letterSpacing:2}},'✦  AVKAR · JOURNAL'),
+      h('button',{className:'btn-nav',onClick:onBack},'← Back')
     ),
-    // Session label
-    React.createElement('div',{style:{padding:'9px 18px',borderBottom:'1px solid #080e14',flexShrink:0,display:'flex',alignItems:'center',gap:12}},
-      React.createElement('span',{style:{background:meta.color+'22',border:'1px solid '+meta.color+'44',color:meta.color,fontSize:9,padding:'3px 12px',borderRadius:20,letterSpacing:2,fontWeight:700}},meta.label),
-      React.createElement('span',{style:{color:'#2a4060',fontSize:10}},meta.sub)
+    h('div',{style:{padding:'10px 22px',borderBottom:'1px solid var(--border)',flexShrink:0,display:'flex',alignItems:'center',gap:14,background:'var(--bg2)'}},
+      h('span',{style:{background:'var(--bg3)',border:'1px solid var(--border2)',color:meta.color,fontFamily:'monospace',fontSize:11,padding:'4px 14px',borderRadius:20,letterSpacing:2,fontWeight:700}},meta.label),
+      h('span',{style:{color:'var(--text3)',fontFamily:'monospace',fontSize:12}},meta.sub)
     ),
-    // Toggle guide
-    React.createElement('button',{onClick:()=>setShowGuide(v=>!v),style:{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'8px 18px',background:'#06090f',border:'none',borderBottom:'1px solid #0d1820',color:'#3a6070',fontSize:10,letterSpacing:1,flexShrink:0,width:'100%',textAlign:'left'}},
-      React.createElement('span',null,'📋 '+(showGuide?'Hide':'Show')+' Speaking Guide'),
-      React.createElement('span',{style:{opacity:0.5}},showGuide?'▲':'▼')
+    h('button',{onClick:()=>setShowGuide(v=>!v),style:{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'10px 22px',background:'var(--bg3)',border:'none',borderBottom:'1px solid var(--border)',color:'var(--text2)',fontFamily:'monospace',fontSize:13,flexShrink:0,width:'100%',textAlign:'left',letterSpacing:1}},
+      h('span',null,'📋  '+(showGuide?'Hide':'Show')+' Speaking Guide'),
+      h('span',{style:{opacity:.5,fontSize:11}},showGuide?'▲':'▼')
     ),
-    // Body
-    React.createElement('div',{style:{flex:1,display:'flex',overflow:'hidden'}},
-      showGuide&&React.createElement(GuidePanel,{guide}),
-      React.createElement('div',{style:{flex:1,display:'flex',flexDirection:'column',padding:'12px 16px',position:'relative',overflow:'hidden'}},
-        React.createElement('div',{style:{position:'relative',flex:1,display:'flex',flexDirection:'column'}},
-          React.createElement('textarea',{value:text,onChange:e=>setText(e.target.value),placeholder:'Tap here → tap 🎤 mic on keyboard → speak freely about all the topics in the guide…',style:{flex:1,height:'100%',paddingRight:'44px'}}),
-          React.createElement('div',{style:{position:'absolute',top:13,right:13,fontSize:15,pointerEvents:'none',opacity:0.25}},'🎤'),
-          React.createElement('div',{style:{position:'absolute',bottom:10,right:13,color:'#1e3040',fontSize:9}},words+' words')
+    h('div',{style:{flex:1,display:'flex',overflow:'hidden'}},
+      showGuide&&h(GuidePanel,{guide}),
+      h('div',{style:{flex:1,display:'flex',flexDirection:'column',padding:'14px 18px',position:'relative',overflow:'hidden'}},
+        h('div',{style:{position:'relative',flex:1,display:'flex',flexDirection:'column'}},
+          h('textarea',{value:text,onChange:ev=>setText(ev.target.value),placeholder:'Tap here → tap 🎤 mic on keyboard → speak freely about all the topics in the guide…',style:{flex:1,height:'100%',paddingRight:'46px'}}),
+          h('div',{style:{position:'absolute',top:14,right:14,fontSize:16,pointerEvents:'none',opacity:.28}},'🎤'),
+          h('div',{style:{position:'absolute',bottom:11,right:14,color:'var(--text3)',fontFamily:'monospace',fontSize:11}},words+' words')
         )
       )
     ),
-    // Save
-    React.createElement('button',{onClick:handleSave,disabled:status==='saving',style:{padding:'17px',background:status==='saved'?'linear-gradient(135deg,#059669,#10b981)':status==='saving'?'#080f18':'linear-gradient(135deg,#0097a7,#00e5ff)',border:'none',color:status==='saved'?'#fff':status==='saving'?'#4dd9e0':'#000',fontSize:11,fontWeight:900,letterSpacing:3,flexShrink:0,transition:'all 0.3s'}},
+    h('button',{onClick:handleSave,disabled:status==='saving',style:{padding:'18px',background:status==='saved'?'linear-gradient(135deg,#3a9a6a,#5ec490)':status==='saving'?'var(--bg3)':'linear-gradient(135deg,var(--amber-d),var(--amber))',border:'none',color:status==='saving'?'var(--amber)':'#fff',fontFamily:'monospace',fontSize:13,fontWeight:900,letterSpacing:3,flexShrink:0,transition:'all .3s'}},
       status==='saved'?'✓ SAVED TO GOOGLE SHEETS':status==='saving'?'EXTRACTING & SAVING...':'EXTRACT & SAVE TO GOOGLE SHEETS →'
     )
   );
 }
 
-// ── SESSION SELECTOR ─────────────────────────────────────────────────────────
 function SessionSelector({onSelect,onHome}){
   const sessions=[
-    {id:'premarket',icon:'🌅',label:'PRE MARKET',color:'#4dd9e0',meta:'57 fields · Before 9:30 AM'},
-    {id:'tradelog',icon:'📊',label:'TRADE LOG',color:'#f0c040',meta:'83 fields · After each trade'},
-    {id:'eod',icon:'🌙',label:'END OF DAY',color:'#34d399',meta:'Tabs 3+4 · After session'},
+    {id:'premarket',icon:'🌅',label:'Pre Market',color:'var(--teal)',meta:'Tab 1 · Before 9:30 AM'},
+    {id:'tradelog',icon:'📊',label:'Trade Log',color:'var(--amber)',meta:'Tab 2 · After each trade'},
+    {id:'eod',icon:'🌙',label:'End of Day',color:'var(--green)',meta:'Tabs 3+4 · After session'},
   ];
-  return React.createElement('div',{style:{position:'relative',zIndex:1,overflowY:'auto',height:'100vh'}},
-    React.createElement('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'12px 18px',borderBottom:'1px solid #0d1820'}},
-      React.createElement('span',{style:{color:'#4dd9e0',fontSize:10,letterSpacing:2}},'✦ AVKAR · JOURNAL'),
-      React.createElement('button',{onClick:onHome,style:{background:'none',border:'1px solid #1e2a3a',color:'#4dd9e0',borderRadius:8,padding:'5px 14px',fontSize:10,letterSpacing:1}},'🏠 Home')
+  return h('div',{style:{position:'relative',zIndex:1,height:'100vh',background:'var(--bg)',display:'flex',flexDirection:'column'}},
+    h('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'14px 22px',borderBottom:'1px solid var(--border)',background:'var(--bg2)',flexShrink:0}},
+      h('span',{style:{color:'var(--amber)',fontFamily:'monospace',fontSize:14,letterSpacing:2}},'✦  AVKAR · JOURNAL'),
+      h('button',{className:'btn-nav',onClick:onHome},'🏠  Home')
     ),
-    React.createElement('div',{style:{padding:'22px 18px'}},
-      React.createElement('div',{style:{borderLeft:'2px solid #1e3a50',paddingLeft:14,marginBottom:28,color:'#6a8a9a',fontStyle:'italic',fontSize:12,lineHeight:1.7,fontFamily:'Georgia,serif'}},
+    h('div',{style:{padding:'26px 22px',overflowY:'auto',flex:1}},
+      h('div',{style:{borderLeft:'3px solid var(--amber-d)',paddingLeft:16,marginBottom:32,color:'var(--text2)',fontStyle:'italic',fontSize:16,lineHeight:1.8}},
         '"The undisciplined trader\'s biggest enemy is himself. The journal is the mirror."',
-        React.createElement('div',{style:{color:'#254050',fontSize:10,marginTop:5,letterSpacing:1}},'— Mark Douglas')
+        h('div',{style:{color:'var(--text3)',fontFamily:'monospace',fontSize:11,marginTop:7,letterSpacing:1}},'— Mark Douglas')
       ),
-      React.createElement('div',{style:{color:'#e8f4f8',fontSize:18,fontWeight:700,marginBottom:4,letterSpacing:1}},'What are you logging?'),
-      React.createElement('div',{style:{color:'#4dd9e0',fontSize:9,letterSpacing:2,marginBottom:22}},'CHOOSE YOUR SESSION TYPE'),
-      React.createElement('div',{style:{display:'flex',gap:12,flexWrap:'wrap'}},
-        sessions.map(s=>React.createElement('button',{key:s.id,onClick:()=>onSelect(s.id),style:{flex:'1 1 130px',minHeight:108,background:'#080d14',border:'1.5px solid '+s.color+'44',borderRadius:12,color:s.color,fontSize:11,fontWeight:700,letterSpacing:1,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:8,padding:14,transition:'border-color 0.2s'}},
-          React.createElement('span',{style:{fontSize:22}},s.icon),
-          React.createElement('span',null,s.label),
-          React.createElement('span',{style:{color:s.color+'66',fontSize:9,letterSpacing:0,fontWeight:400}},s.meta)
+      h('div',{style:{color:'var(--text1)',fontSize:22,fontWeight:700,marginBottom:6,letterSpacing:.5}},'What are you logging?'),
+      h('div',{style:{color:'var(--amber)',fontFamily:'monospace',fontSize:11,letterSpacing:2,marginBottom:24}},'CHOOSE YOUR SESSION TYPE'),
+      h('div',{style:{display:'flex',gap:16,flexWrap:'wrap'}},
+        sessions.map(s=>h('button',{key:s.id,onClick:()=>onSelect(s.id),style:{flex:'1 1 160px',minHeight:120,background:'var(--bg2)',border:'1.5px solid var(--border2)',borderRadius:14,color:s.color,fontSize:16,fontWeight:700,letterSpacing:1,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:10,padding:18,transition:'background .15s',fontFamily:'Georgia,serif'}},
+          h('span',{style:{fontSize:26}},s.icon),
+          h('span',null,s.label),
+          h('span',{style:{color:'var(--text3)',fontSize:11,fontFamily:'monospace',fontWeight:400,marginTop:2}},s.meta)
         ))
       )
     )
   );
 }
 
-// ── SPLASH ───────────────────────────────────────────────────────────────────
 function Splash({quotes,onStart,onManageQuotes}){
   const [idx,setIdx]=useState(0);
   const [fade,setFade]=useState(true);
@@ -288,41 +220,37 @@ function Splash({quotes,onStart,onManageQuotes}){
   const q=quotes[idx]||quotes[0];
   const ds=now.toLocaleDateString('en-US',{weekday:'long',month:'short',day:'numeric'});
   const ts=now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
-  return React.createElement('div',{style:{height:'100vh',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',position:'relative',zIndex:1,padding:'40px 24px'}},
-    React.createElement('div',{style:{fontSize:10,letterSpacing:5,color:'#4dd9e0',marginBottom:52,opacity:0.8,display:'flex',alignItems:'center',gap:10}},
-      React.createElement('span',{style:{fontSize:12}},'✦'),'AVKAR',React.createElement('span',{style:{opacity:0.3}},'·'),'TRADING JOURNAL'
+  return h('div',{style:{height:'100vh',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',position:'relative',zIndex:1,padding:'40px 32px'}},
+    h('div',{style:{fontFamily:'monospace',fontSize:12,letterSpacing:5,color:'var(--amber)',marginBottom:52,opacity:.9,display:'flex',alignItems:'center',gap:12}},
+      h('span',{style:{fontSize:14}},'✦'),'AVKAR',h('span',{style:{opacity:.3}},'·'),'TRADING JOURNAL'
     ),
-    React.createElement('div',{style:{textAlign:'center',maxWidth:480,marginBottom:56,transition:'opacity 0.35s',opacity:fade?1:0}},
-      React.createElement('div',{style:{color:'#c8dce8',fontFamily:'Georgia,serif',fontSize:21,fontStyle:'italic',lineHeight:1.7,marginBottom:16}},'"'+q.text+'"'),
-      q.author&&React.createElement('div',{style:{color:'#254050',fontSize:10,letterSpacing:3}},'— '+q.author.toUpperCase())
+    h('div',{style:{textAlign:'center',maxWidth:560,marginBottom:58,transition:'opacity .35s',opacity:fade?1:0}},
+      h('div',{style:{color:'var(--text1)',fontFamily:'Georgia,serif',fontSize:24,fontStyle:'italic',lineHeight:1.8,marginBottom:18}},'"'+q.text+'"'),
+      q.author&&h('div',{style:{color:'var(--amber-d)',fontFamily:'monospace',fontSize:11,letterSpacing:3}},'— '+q.author.toUpperCase())
     ),
-    React.createElement('button',{onClick:onStart,style:{background:'linear-gradient(135deg,#0097a7,#00e5ff)',border:'none',borderRadius:14,color:'#000',fontSize:14,fontWeight:900,letterSpacing:3,padding:'20px 52px',marginBottom:18,boxShadow:'0 0 28px #00bcd420',WebkitTapHighlightColor:'transparent'}},
-      'START JOURNAL SESSION'
+    h('button',{className:'btn-cta',onClick:onStart},'START JOURNAL SESSION'),
+    h('div',{style:{display:'flex',gap:12,marginTop:20}},
+      h('button',{onClick:onManageQuotes,style:{background:'none',border:'1px solid var(--border2)',color:'var(--text3)',borderRadius:10,padding:'9px 20px',fontFamily:'monospace',fontSize:12,letterSpacing:1}},'✎  Quotes'),
+      h('button',{style:{background:'none',border:'1px solid var(--border2)',color:'var(--text3)',borderRadius:10,padding:'9px 20px',fontFamily:'monospace',fontSize:12,letterSpacing:1}},'⚙  Settings')
     ),
-    React.createElement('div',{style:{display:'flex',gap:10}},
-      React.createElement('button',{onClick:onManageQuotes,style:{background:'none',border:'1px solid #1e2a3a',color:'#2a4a5a',borderRadius:9,padding:'7px 16px',fontSize:10,letterSpacing:1}},'✎ Quotes'),
-      React.createElement('button',{style:{background:'none',border:'1px solid #1e2a3a',color:'#2a4a5a',borderRadius:9,padding:'7px 16px',fontSize:10,letterSpacing:1}},'⚙ Settings')
-    ),
-    React.createElement('div',{style:{position:'absolute',bottom:28,color:'#1e3040',fontSize:10,letterSpacing:2}},ds+' · '+ts)
+    h('div',{style:{position:'absolute',bottom:28,color:'var(--text3)',fontFamily:'monospace',fontSize:11,letterSpacing:2}},ds+' · '+ts)
   );
 }
 
-// ── APP ──────────────────────────────────────────────────────────────────────
 function App(){
   const [screen,setScreen]=useState('splash');
   const [session,setSession]=useState(null);
-  const [quotes,setQuotes]=useState(DEFAULT_QUOTES);
+  const [quotes,setQuotes]=useState(QUOTES);
   const [showQM,setShowQM]=useState(false);
-  return React.createElement('div',{style:{height:'100vh',background:'radial-gradient(ellipse at 30% 20%,#0a1220 0%,#040810 60%,#020508 100%)',overflow:'hidden'}},
-    React.createElement(Stars),
-    showQM&&React.createElement(QuoteModal,{quotes,onSave:q=>{setQuotes(q);setShowQM(false);},onClose:()=>setShowQM(false)}),
-    screen==='splash'&&React.createElement(Splash,{quotes,onStart:()=>setScreen('select'),onManageQuotes:()=>setShowQM(true)}),
-    screen==='select'&&React.createElement(SessionSelector,{onSelect:s=>{setSession(s);setScreen('journal');},onHome:()=>setScreen('splash')}),
-    screen==='journal'&&React.createElement(JournalScreen,{session,onBack:()=>setScreen('select')})
+  return h('div',{style:{height:'100vh',background:'var(--bg)',overflow:'hidden'}},
+    h(Stars),
+    showQM&&h(QuoteModal,{quotes,onSave:q=>{setQuotes(q);setShowQM(false);},onClose:()=>setShowQM(false)}),
+    screen==='splash'&&h(Splash,{quotes,onStart:()=>setScreen('select'),onManageQuotes:()=>setShowQM(true)}),
+    screen==='select'&&h(SessionSelector,{onSelect:s=>{setSession(s);setScreen('journal');},onHome:()=>setScreen('splash')}),
+    screen==='journal'&&h(JournalScreen,{session,onBack:()=>setScreen('select')})
   );
 }
-
-ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(App));
+ReactDOM.createRoot(document.getElementById('root')).render(h(App));
 </script>
 </body>
 </html>
