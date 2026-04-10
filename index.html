@@ -48,7 +48,7 @@ textarea{width:100%;background:#08080f;border:1px solid #252538;border-radius:8p
 
 <!-- SETUP -->
 <div id="p-setup" class="page active">
-  <div class="hdr"><span class="logo">Avkar · Trading Journal</span><span style="font-size:10px;color:#333355">v4.0</span></div>
+  <div class="hdr"><span class="logo">Avkar · Trading Journal</span><span style="font-size:10px;color:#333355">v5.0</span></div>
   <div class="wrap">
     <h1>Setup</h1>
     <div class="sub">Saved on this device</div>
@@ -58,9 +58,7 @@ textarea{width:100%;background:#08080f;border:1px solid #252538;border-radius:8p
       <div class="note">Get free at <strong style="color:#00d4ff">console.anthropic.com</strong> → API Keys<br>~$0.01 per entry (Haiku model)</div>
       <label>Google Spreadsheet ID</label>
       <input id="sid" placeholder="From URL: /d/YOUR_ID/edit">
-      <label>Google API Key</label>
-      <input id="gk" type="password" placeholder="AIzaSy...">
-      <div class="note">Sheet: <strong style="color:#00d4ff">Trading Journal 2026</strong><br>4 tabs: Pre-Market Prep · Trade Log · EOD Debrief · Daily Life &amp; Identity</div>
+      <div class="note">No Google API key needed anymore ✓</div>
       <div id="setup-err"></div>
       <button class="btn bc" onclick="goMode()">Save &amp; Continue →</button>
     </div>
@@ -124,6 +122,9 @@ textarea{width:100%;background:#08080f;border:1px solid #252538;border-radius:8p
 </div>
 
 <script>
+// ── APPS SCRIPT URL ───────────────────────────────────────────────────────────
+var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzpIB_QiEIy0BDPlFLQnZgQu6p97fkR8RiBTEeMQ6OuEwembTpuEfQLjD6Phw9Ugj4piA/exec';
+
 // ── PROMPTS ───────────────────────────────────────────────────────────────────
 var PM_PROMPT = 'You are extracting structured data from a trading journal voice transcript for Avkar, an NQ futures trader. V1 = destructive pattern, V2 = true self. Extract ONLY what is explicitly mentioned, null for everything else. Return ONLY valid JSON, no markdown, no explanation.\n\nExtract these fields:\n{"date":"YYYY-MM-DD","day":"weekday","wake_up_time":"HH:MM","sleep_hours":0,"sleep_quality":"Poor/OK/Good","alcohol_previous_night":"Y/N","alcohol_amount":"Light/Moderate/Heavy","feeling_emotional_state":"Rush/Impatient/Calm/Tired/Anxious/Other","energy_level":0,"supplement_adhd_med":"Y/N","financial_stress_level":0,"survival_pressure_felt":"Y/N","cold_water_done":"Y/N","light_exercise_done":"Y/N","visualization_meditation_done":"Y/N","physiological_sighs_done":"Y/N","body_scan_done":"Y/N","body_scan_result":"text","identity_statement_read":"Y/N","alarmy_ritual_completed":"Y/N","music_playlist_on":"Y/N","which_version_today":"V1/V2/Mixed","v1_belief_active_morning":"text","v2_state_accessed":"Y/N","nervous_system_state":"word","inner_talk_morning":"V1 type/V2 type/Mixed","todays_single_behavioral_goal":"text","weekly_main_goal":"text","dopamine_bridge_planned":"text","timer_90min_set":"Y/N","account_type_today":"Demo/Eval","current_profit_target_pct":0,"above_60pct_profit_target":"Y/N","circuit_breaker_reviewed":"Y/N","stoic_morning_statement_read":"Y/N","previous_day_candle":"Strong green/Strong red/Doji/Hammer/Other","open_scenario":"text","qqq_vs_2day_avwap":"Above/Below","qqq_bias":"Bullish/Bearish/Neutral","market_short_term_trend":"Bullish/Bearish/Sideways","market_long_term_trend":"Bullish/Bearish/Sideways","mag7_strength":"Bullish/Bearish/Mixed","futures_direction":"Up/Down/Flat","key_levels_nq":"text","possible_entry_location":"text","main_plan":"text","entry_type":"Anticipated/Confirmed","entry_trigger":"text","stop_level":"text","invalidation":"text","two_scenarios":"text","max_loss_today":0,"max_trades_today":0,"levels_marked_on_chart":"Y/N","notes":"text","active_v1_belief_entering_session":"text","window_of_tolerance_score_open":0}\n\nTranscript:';
 
@@ -144,65 +145,52 @@ var T4H=["Date","Overall V2 Score","Which Version Dominated Life","Acted How Sup
 var T4K=["date","overall_v2_score","which_version_dominated_life","acted_how_supposed_to","did_what_supposed_to","binary_score","wake_up_state","sleep_hours","sleep_quality","alcohol_last_night","alcohol_amount","exercise_done","exercise_type","nutrition_quality","supplement_adhd_med","energy_level","cold_exposure_done","mood_score","mood_type","dominant_feeling_today","feeling_duration","what_triggered_feeling","anxiety_level","financial_stress_level","survival_pressure_felt","primary_feeling_today","stress_source","emotional_trigger_today","how_handled_emotional_trigger","v1_belief_activated_today","v1_behavior_caught","v1_inner_talk_detected","v1_inner_talk_content","v1_feeling_activated","what_triggered_v1_feeling","reason_underneath_v1","how_long_v1_feeling_lasted","named_before_escaping","v1_behavior_it_drove","v1_won_or_returned","v2_moment_today","acted_with_certainty","said_what_needed_to_be_said","spoke_loud_with_control","avoided_people_pleasing","took_action_instead_of_planning","patient_score_life","fearless_score_life","disciplined_score_life","consistent_score_life","focus_quality","distraction_level","impulsivity_outside_trading","productive_hours","dopamine_seeking","dopamine_seeking_looked_like","planned_work_done","morning_ritual_done","journaling_done","alarmy_ritual_done","screen_time_controlled","alcohol_today","daily_goal","daily_goal_hit","why_goal_not_hit","job_search_progress","one_thing_moved_forward","one_thing_avoided","relationship_quality","disruption_external","how_responded_to_disruption","isolation_level","gratitude","stoic_morning_statement_read","acted_from_fear_of_judgment","made_someone_comfortable_at_own_expense","explained_when_silence_enough","non_reactive_response_used","somatic_practice_done","v1_body_state_before","v2_body_state_after","state_shift_achieved","identity_rehearsal_done","rehearsal_real_or_performed","body_present_rehearsal","v1_belief_resistant_to_identity_statement","defence_mechanism_blocked_rehearsal","shadow_question_answered","what_discovered_shadow","escape_named_instead_of_taken","what_was_underneath_escape","assumption_behind_escape","secondary_gain_of_escape","defence_mechanism_during_escape","this_weeks_micro_action","micro_action_done","resistance_level","sunday_checkin_done","pattern_claude_identified","uncomfortable_truth_this_week","next_week_single_focus","signal_recognized_outside_trading","five_second_rule_applied_life","five_second_rule_window","values_gap_today","values_gap_description","unmet_need_reactive_moment","window_of_tolerance_daily","one_win_behavioral","one_correction_tomorrow","how_close_to_him_today"];
 
 // ── STATE ─────────────────────────────────────────────────────────────────────
-var G = {
-  mode: null,
-  results: null
-};
-
+var G = { mode: null, results: null };
 function lget(k,d){ try{ return localStorage.getItem(k)||d; }catch(e){ return d; } }
 function lset(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
 
-// ── HELPERS ───────────────────────────────────────────────────────────────────
+// ── UI HELPERS ────────────────────────────────────────────────────────────────
 function show(page) {
   document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); });
   document.getElementById('p-'+page).classList.add('active');
   window.scrollTo(0,0);
 }
-
 function showErr(id, msg) {
   var el = document.getElementById(id);
   if(el) el.innerHTML = msg ? '<div class="err">'+msg+'</div>' : '';
 }
-
-function setLoading(title, sub, note) {
-  document.getElementById('proc-title').textContent = title || 'Processing…';
-  document.getElementById('proc-sub').textContent = sub || '';
-  document.getElementById('proc-note').textContent = note || '';
-}
-
 function updateWC() {
   var t = document.getElementById('transcript');
   if(!t) return;
   var w = t.value.trim().split(/\s+/).filter(function(x){return x;}).length;
   document.getElementById('wc').textContent = w + ' words';
 }
+function setLoading(t,s,n) {
+  document.getElementById('proc-title').textContent = t||'Processing…';
+  document.getElementById('proc-sub').textContent = s||'';
+  document.getElementById('proc-note').textContent = n||'';
+}
 
 // ── NAVIGATION ────────────────────────────────────────────────────────────────
 function goMode() {
   var ak = document.getElementById('ak').value.trim();
   var sid = document.getElementById('sid').value.trim();
-  var gk = document.getElementById('gk').value.trim();
-  if(!ak||!sid||!gk){ showErr('setup-err','Please fill in all 3 fields.'); return; }
-  lset('ak',ak); lset('sid',sid); lset('gk',gk);
+  if(!ak||!sid){ showErr('setup-err','Please fill in both fields.'); return; }
+  lset('ak',ak); lset('sid',sid);
   show('mode');
 }
-
 function setMode(m) {
   G.mode = m;
   var colors = {premarket:'#00d4ff',tradelog:'#ff9500',eod:'#00e676'};
   var labels = {premarket:'Pre-Market Prep',tradelog:'Trade Log',eod:'End of Day'};
-  var c = colors[m]; var l = labels[m];
-  var tag = document.getElementById('mode-tag');
-  tag.innerHTML = '<span style="display:inline-block;background:'+c+'22;color:'+c+';border:1px solid '+c+'44;border-radius:5px;padding:2px 8px;font-size:10px;letter-spacing:0.08em;margin-right:10px">'+l+'</span><span style="font-size:12px;color:#5555aa">Speak or type freely</span>';
-  var btn = document.getElementById('submit-btn');
-  btn.style.background = c;
-  var ta = document.getElementById('transcript');
-  ta.value = '';
+  var c = colors[m];
+  document.getElementById('mode-tag').innerHTML = '<span style="display:inline-block;background:'+c+'22;color:'+c+';border:1px solid '+c+'44;border-radius:5px;padding:2px 8px;font-size:10px;margin-right:10px">'+labels[m]+'</span><span style="font-size:12px;color:#5555aa">Speak or type freely</span>';
+  document.getElementById('submit-btn').style.background = c;
+  document.getElementById('transcript').value = '';
   document.getElementById('wc').textContent = '0 words';
   showErr('input-err','');
   show('input');
 }
-
 function logAgain() {
   document.getElementById('transcript').value = '';
   document.getElementById('wc').textContent = '0 words';
@@ -210,7 +198,7 @@ function logAgain() {
   show('input');
 }
 
-// ── API CALLS ─────────────────────────────────────────────────────────────────
+// ── CLAUDE ────────────────────────────────────────────────────────────────────
 function callClaude(ak, prompt, transcript) {
   return fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
@@ -233,69 +221,46 @@ function callClaude(ak, prompt, transcript) {
   });
 }
 
-function writeRow(sid, gk, tab, row, vals) {
-  var range = encodeURIComponent(tab+'!A'+row);
-  var url = 'https://sheets.googleapis.com/v4/spreadsheets/'+sid+'/values/'+range+'?valueInputOption=RAW&key='+gk;
-  return fetch(url, {
-    method: 'PUT',
-    headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({values:[vals]})
-  }).then(function(r){
-    if(!r.ok) return r.json().then(function(e){ throw new Error('Sheets: '+(e.error&&e.error.message||'write failed')); });
+// ── SHEETS VIA APPS SCRIPT ────────────────────────────────────────────────────
+function writeTab(sid, tab, headers, keys, data) {
+  var vals = keys.map(function(k){ var v=data[k]; return (v===null||v===undefined)?'':String(v); });
+  return fetch(SCRIPT_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain' },
+    body: JSON.stringify({ sheetId: sid, tab: tab, headers: headers, values: vals })
+  }).then(function(r){ return r.json(); }).then(function(res){
+    if(res.error) throw new Error('Sheets: ' + res.error);
+    return { keys: keys, headers: headers, data: data };
   });
-}
-
-function writeTab(sid, gk, tab, headers, keys, data) {
-  var range = encodeURIComponent(tab+'!A:A');
-  return fetch('https://sheets.googleapis.com/v4/spreadsheets/'+sid+'/values/'+range+'?key='+gk)
-    .then(function(r){ return r.json(); })
-    .then(function(cd){
-      if(cd.error) throw new Error('Sheets check: '+cd.error.message);
-      var rows = (cd.values && cd.values.length) || 0;
-      var vals = keys.map(function(k){ var v=data[k]; return (v===null||v===undefined)?'':String(v); });
-      if(rows===0){
-        return writeRow(sid,gk,tab,1,headers)
-          .then(function(){ return new Promise(function(r){setTimeout(r,600);}); })
-          .then(function(){ return writeRow(sid,gk,tab,2,vals); });
-      } else {
-        return writeRow(sid,gk,tab,rows+1,vals);
-      }
-    }).then(function(){ return {keys:keys,headers:headers,data:data}; });
 }
 
 // ── SUBMIT ────────────────────────────────────────────────────────────────────
 function doSubmit() {
   var transcript = document.getElementById('transcript').value.trim();
-  if(!transcript){ return; }
-  var ak = lget('ak',''); var sid = lget('sid',''); var gk = lget('gk','');
-  if(!ak||!sid||!gk){ showErr('input-err','Missing credentials — go to Setup.'); return; }
-
+  if(!transcript) return;
+  var ak = lget('ak','');
+  var sid = lget('sid','');
+  if(!ak||!sid){ showErr('input-err','Missing credentials — go to Setup.'); return; }
   show('processing');
   var mode = G.mode;
   var colors = {premarket:'#00d4ff',tradelog:'#ff9500',eod:'#00e676'};
-
   document.getElementById('proc-title').style.color = colors[mode];
-
   var promise;
   if(mode==='premarket'){
-    setLoading('Extracting pre-market fields…','Sending to Claude Haiku','');
+    setLoading('Extracting pre-market fields…','Sending to Claude…','');
     promise = callClaude(ak, PM_PROMPT, transcript).then(function(d){
       setLoading('Writing to Google Sheets…','Pre-Market Prep tab','');
-      return writeTab(sid,gk,'Pre-Market Prep',T1H,T1K,d).then(function(r){
-        return {'Pre-Market Prep':r};
-      });
+      return writeTab(sid,'Pre-Market Prep',T1H,T1K,d).then(function(r){ return {'Pre-Market Prep':r}; });
     });
   } else if(mode==='tradelog'){
-    setLoading('Extracting trade fields…','Sending to Claude Haiku','');
+    setLoading('Extracting trade fields…','Sending to Claude…','');
     promise = callClaude(ak, TL_PROMPT, transcript).then(function(d){
       setLoading('Writing to Google Sheets…','Trade Log tab','');
-      return writeTab(sid,gk,'Trade Log',T2H,T2K,d).then(function(r){
-        return {'Trade Log':r};
-      });
+      return writeTab(sid,'Trade Log',T2H,T2K,d).then(function(r){ return {'Trade Log':r}; });
     });
   } else {
-    setLoading('Extracting EOD session data…','Call 1 of 2','EOD takes ~20 seconds — 2 Claude calls + 2 Sheets writes');
-    var d3,d4;
+    setLoading('Extracting EOD session data…','Call 1 of 2 — takes ~20 sec','');
+    var d3, d4;
     promise = callClaude(ak, E3_PROMPT, transcript).then(function(d){
       d3=d;
       setLoading('Extracting life & identity data…','Call 2 of 2','');
@@ -304,31 +269,26 @@ function doSubmit() {
       d4=d;
       if(!d4.date&&d3.date) d4.date=d3.date;
       setLoading('Writing EOD Debrief tab…','Sheets write 1 of 2','');
-      return writeTab(sid,gk,'EOD Debrief',T3H,T3K,d3);
+      return writeTab(sid,'EOD Debrief',T3H,T3K,d3);
     }).then(function(r3){
       setLoading('Writing Daily Life & Identity tab…','Sheets write 2 of 2','');
-      return new Promise(function(res){setTimeout(res,500);}).then(function(){
-        return writeTab(sid,gk,'Daily Life & Identity',T4H,T4K,d4).then(function(r4){
-          return {'EOD Debrief':r3,'Daily Life & Identity':r4};
-        });
+      return writeTab(sid,'Daily Life & Identity',T4H,T4K,d4).then(function(r4){
+        return {'EOD Debrief':r3,'Daily Life & Identity':r4};
       });
     });
   }
-
   promise.then(function(results){
     G.results = results;
     var ml={premarket:'Pre-Market Prep',tradelog:'Trade Log',eod:'End of Day'};
     document.getElementById('confirm-sub').textContent = ml[mode]+' · '+new Date().toLocaleTimeString();
-    var again = document.getElementById('again-btn');
-    again.style.background = colors[mode];
+    document.getElementById('again-btn').style.background = colors[mode];
     var html = '';
     for(var tab in results){
       var info = results[tab];
       var filled = info.keys.filter(function(k){ var v=info.data[k]; return v!==null&&v!==undefined&&v!==''; });
       var rows = filled.slice(0,20).map(function(k){
         var hi = info.keys.indexOf(k);
-        var label = info.headers[hi]||k;
-        return '<div class="fr"><div class="fk">'+label+'</div><div class="fv">'+String(info.data[k])+'</div></div>';
+        return '<div class="fr"><div class="fk">'+(info.headers[hi]||k)+'</div><div class="fv">'+String(info.data[k])+'</div></div>';
       }).join('');
       var more = filled.length>20 ? '<div style="font-size:10px;color:#333355;text-align:center;padding-top:10px">+ '+(filled.length-20)+' more fields written</div>' : '';
       html += '<div class="card"><div style="display:flex;justify-content:space-between;margin-bottom:12px"><div style="font-size:11px;font-weight:700;color:#7777bb;letter-spacing:0.1em;text-transform:uppercase">'+tab+'</div><span style="background:#00e67622;color:#00e676;border:1px solid #00e67644;border-radius:5px;padding:2px 8px;font-size:10px">'+filled.length+' fields</span></div>'+rows+more+'</div>';
@@ -344,7 +304,6 @@ function doSubmit() {
 // ── INIT ──────────────────────────────────────────────────────────────────────
 document.getElementById('ak').value = lget('ak','');
 document.getElementById('sid').value = lget('sid','');
-document.getElementById('gk').value = lget('gk','');
 </script>
 </body>
 </html>
