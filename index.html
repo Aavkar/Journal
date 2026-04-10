@@ -11,243 +11,368 @@
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 <style>
-:root{
-  --bg:#181d2a;--bg2:#1f2535;--bg3:#262e40;--bg4:#2d364a;
-  --border:#2e3a50;--border2:#38485e;
-  --amber:#d4956a;--amber-l:#e8b48e;--amber-d:#a8704e;
-  --teal:#4ecdc4;--red:#e07070;--purple:#9b8ed4;--green:#5ec490;
-  --text1:#e8e4dc;--text2:#a8afc0;--text3:#5a6475;
+:root {
+  --bg:       #181d2a;
+  --bg2:      #1f2535;
+  --bg3:      #262e40;
+  --bg4:      #2d364a;
+  --border:   #2e3a50;
+  --border2:  #38485e;
+  --amber:    #d4956a;
+  --amber-l:  #ebbe96;
+  --amber-d:  #a8704e;
+  --teal:     #4ecdc4;
+  --red:      #e07878;
+  --purple:   #a08edc;
+  --green:    #5ec490;
+  --text1:    #ede9e0;
+  --text2:    #a8b0c0;
+  --text3:    #4e5a6a;
 }
-*{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;overflow:hidden}
-body{background:var(--bg);color:var(--text1);font-family:Georgia,serif;-webkit-text-size-adjust:100%}
-#root{height:100vh;overflow:hidden}
-::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px}
-textarea{font-family:Georgia,serif;font-size:15px;color:var(--text1);background:var(--bg);border:1px solid var(--border2);border-radius:10px;padding:16px 48px 16px 16px;line-height:1.9;resize:none;outline:none;width:100%}
-textarea::placeholder{color:var(--text3)}
-button{cursor:pointer;-webkit-tap-highlight-color:transparent;font-family:Georgia,serif}
-.btn-nav{background:var(--bg3);border:1px solid var(--border2);color:var(--amber-l);border-radius:10px;padding:10px 22px;font-size:14px;letter-spacing:1px;font-family:monospace}
-.section-label{font-size:10px;letter-spacing:2.5px;font-family:monospace;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid var(--border);opacity:.95}
-.guide-item{display:flex;align-items:center;gap:9px;margin-bottom:7px}
-.g-dot-f{width:6px;height:6px;border-radius:50%;flex-shrink:0}
-.g-dot-e{width:4px;height:4px;border-radius:50%;background:var(--border2);flex-shrink:0;margin-left:1px}
-.g-txt{font-size:13px;line-height:1.4;font-family:monospace}
-.g-hi{color:var(--text1)}.g-lo{color:var(--text3)}
-.btn-cta{background:linear-gradient(135deg,var(--amber-d),var(--amber));border:none;border-radius:14px;color:#fff;font-size:15px;font-weight:700;letter-spacing:3px;font-family:monospace;padding:20px 56px;box-shadow:0 4px 24px rgba(212,149,106,.2)}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { height: 100vh; height: 100dvh; }
+body {
+  height: 100vh; height: 100dvh;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--text1);
+  font-family: Georgia, serif;
+  -webkit-text-size-adjust: 100%;
+}
+#root {
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
+textarea {
+  font-family: Georgia, serif;
+  font-size: 15px;
+  color: var(--text1);
+  background: var(--bg);
+  border: 1px solid var(--border2);
+  border-radius: 12px;
+  padding: 16px 48px 16px 16px;
+  line-height: 1.9;
+  resize: none;
+  outline: none;
+  width: 100%;
+}
+textarea::placeholder { color: var(--text3); font-style: italic; }
+input { -webkit-appearance: none; outline: none; }
+button { cursor: pointer; -webkit-tap-highlight-color: transparent; font-family: Georgia, serif; }
+.btn-nav {
+  background: var(--bg3);
+  border: 1px solid var(--border2);
+  color: var(--amber-l);
+  border-radius: 10px;
+  padding: 11px 24px;
+  font-size: 15px;
+  letter-spacing: 1px;
+  font-family: monospace;
+  font-weight: 700;
+  transition: background .15s;
+}
+.btn-nav:active { background: var(--bg4); }
+.btn-cta {
+  background: linear-gradient(135deg, var(--amber-d), var(--amber));
+  border: none;
+  border-radius: 14px;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 900;
+  letter-spacing: 3px;
+  font-family: monospace;
+  padding: 22px 60px;
+  box-shadow: 0 4px 28px rgba(180,120,70,.25);
+  transition: transform .15s;
+}
+.btn-cta:active { transform: scale(0.97); }
 </style>
 </head>
 <body>
 <div id="root"></div>
 <script type="text/babel">
-const {useState,useEffect}=React;
-const h=React.createElement;
+const {useState, useEffect} = React;
+const h = React.createElement;
 
-const STARS=Array.from({length:45},(_,i)=>({id:i,x:Math.random()*100,y:Math.random()*100,s:Math.random()*1.5+0.4,o:Math.random()*0.2+0.07}));
-function Stars(){return h('div',{style:{position:'fixed',inset:0,pointerEvents:'none',zIndex:0}},STARS.map(s=>h('div',{key:s.id,style:{position:'absolute',left:s.x+'%',top:s.y+'%',width:s.s,height:s.s,borderRadius:'50%',background:'#b0b8cc',opacity:s.o}})));}
-
-const QUOTES=[
-  {id:1,text:"What gets measured gets managed. What gets journaled gets mastered.",author:"Peter Drucker — Adapted"},
-  {id:2,text:"The undisciplined trader's biggest enemy is himself. The journal is the mirror.",author:"Mark Douglas"},
-  {id:3,text:"Every trade is a lesson. Every journal entry is a weapon.",author:"Avkar"},
-  {id:4,text:"Consistency is not about being perfect. It's about showing up the same way every day.",author:"Avkar"},
-];
-
-const PM=[
-  {s:"SLEEP & BODY",c:"var(--teal)",d:false,i:["Sleep hrs","Quality (poor/ok/good)","Alcohol last night?","Energy 1–10","Supplements taken?","ADHD med taken?"]},
-  {s:"RITUALS DONE",c:"var(--teal)",d:false,i:["Cold water?","Light exercise?","Visualization?","Body scan done?","Identity stmt read?","Alarm ritual?","Music on?"]},
-  {s:"MENTAL STATE",c:"var(--red)",d:true,i:["V1 or V2 today?","Inner talk type","Active V1 belief?","Nervous system state","Financial stress 1–10","Survival pressure?","Ready to lose calmly?"]},
-  {s:"TODAY'S INTENTION",c:"var(--amber)",d:true,i:["One word intention","Session focus","V2 behaviour goal","What to avoid today","One rule to protect"]},
-  {s:"RISK PARAMETERS",c:"var(--red)",d:false,i:["Max daily loss $","Profit target $","Max # trades","Max contracts","Hard cutoff time"]},
-  {s:"MARKET CONTEXT",c:"var(--purple)",d:false,i:["Major news today?","Pre-mkt NQ move","Gap up / down","Overall trend bias","Correlated mkts"]},
-  {s:"SETUP PLAN",c:"var(--teal)",d:false,i:["Primary setup today","Key support level","Key resistance level","Entry trigger","Confirmation signal","Invalidation level"]},
-];
-const TL=[
-  {s:"TRADE BASICS",c:"var(--teal)",d:false,i:["Time of entry","Instrument","Long or short","Entry price","Contracts / size","Setup name"]},
-  {s:"PRE-ENTRY CHECK",c:"var(--amber)",d:true,i:["Signal confirmed?","Hesitation? Y/N","FOMO involved?","Chased entry?","V1 or V2 mindset?","Body feeling at entry"]},
-  {s:"EXECUTION",c:"var(--teal)",d:false,i:["Entry quality 1–10","Followed exact plan?","Trigger type used","Initial SL placed?","Target set before entry?"]},
-  {s:"TRADE MANAGEMENT",c:"var(--red)",d:true,i:["Moved SL too early?","Scaled out at target?","Added to position?","Exited early? Why?","Held through noise?"]},
-  {s:"EXIT",c:"var(--green)",d:false,i:["Exit time","Exit price","Gross P&L $","Exit reason","Target hit? Y/N","Slippage?"]},
-  {s:"POST-TRADE",c:"var(--purple)",d:true,i:["Grade A/B/C/D","Rule broken? Which?","Best moment","What to fix","Emotion at exit","Repeat this setup?"]},
-];
-const EOD=[
-  {s:"SESSION STATS — TAB 3",c:"var(--teal)",d:false,i:["Start / end time","# trades taken","Winners / losers","Gross P&L $","Fees / commissions","Net P&L $","Win rate %"]},
-  {s:"RISK COMPLIANCE",c:"var(--red)",d:false,i:["Hit daily stop? Y/N","Exceeded trade limit?","Largest single loss $","Largest single win $","Max drawdown today $","Cutoff respected?"]},
-  {s:"BEST TRADE TODAY",c:"var(--green)",d:true,i:["Setup name","What worked","Execution grade","P&L this trade","Could have held longer?","Repeat this?"]},
-  {s:"WORST TRADE TODAY",c:"var(--red)",d:true,i:["Setup name","What went wrong","Was it in the plan?","P&L this trade","Avoidable? How?","Rule broken?"]},
-  {s:"PATTERN REVIEW",c:"var(--purple)",d:false,i:["Common mistake today","Best setup type","Overtraded? Y/N","Revenge trade? Y/N","Time of best trades","Time of worst trades"]},
-  {s:"EMOTIONAL ARC — TAB 4",c:"var(--amber)",d:true,i:["State at open","Peak emotion","Lowest point","State at close","Overall arc: rising/falling"]},
-  {s:"V1 AUDIT",c:"var(--red)",d:true,i:["# V1 moments","Main V1 trigger","Cost of V1 decisions $","Recovery speed","V1 pattern repeating?","V2 response used?"]},
-  {s:"BODY & PRESENCE",c:"var(--teal)",d:false,i:["Chest tension 1–10","Breathing quality","Present or scattered?","Physical energy","Body signalled danger?"]},
-  {s:"IDENTITY CHECK",c:"var(--purple)",d:true,i:["Traded like V2?","Closest V2 moment","Biggest gap to V2","Identity stmt still true?","One word: who was I?"]},
-  {s:"LESSONS & GROWTH",c:"var(--green)",d:true,i:["#1 lesson today","Pattern I now see","Aha moment?","What I'll do differently","Am I improving? Y/N"]},
-  {s:"TOMORROW'S PLAN",c:"var(--amber)",d:false,i:["Reset ritual tonight","Focus adjustment","One thing to avoid","Energy plan for morning","Excited to trade?"]},
-];
-const GUIDES={premarket:PM,tradelog:TL,eod:EOD};
-const META={
-  premarket:{label:"PRE-MARKET PREP",color:"var(--teal)",sub:"Tab 1 · Before 9:30 AM"},
-  tradelog:{label:"TRADE LOG",color:"var(--amber)",sub:"Tab 2 · After each trade"},
-  eod:{label:"END OF DAY",color:"var(--green)",sub:"Tabs 3 + 4 · After session"},
-};
-
-function GuidePanel({guide}){
-  return h('div',{style:{width:'25%',flexShrink:0,overflowY:'auto',padding:'18px 12px 18px 18px',borderRight:'1px solid var(--border)',height:'100%'}},
-    guide.map(b=>h('div',{key:b.s,style:{marginBottom:18}},
-      h('div',{className:'section-label',style:{color:b.c}},b.s),
-      b.i.map(item=>h('div',{key:item,className:'guide-item'},
-        b.d?h('div',{className:'g-dot-f',style:{background:b.c}}):h('div',{className:'g-dot-e'}),
-        h('span',{className:'g-txt '+(b.d?'g-hi':'g-lo')},item)
-      ))
-    ))
+/* ── STARS ── */
+const STARS = Array.from({length:40},(_,i)=>({id:i,x:Math.random()*100,y:Math.random()*100,s:Math.random()*1.4+0.4,o:Math.random()*0.18+0.06}));
+function Stars(){
+  return h('div',{style:{position:'fixed',inset:0,pointerEvents:'none',zIndex:0}},
+    STARS.map(s=>h('div',{key:s.id,style:{position:'absolute',left:s.x+'%',top:s.y+'%',width:s.s,height:s.s,borderRadius:'50%',background:'#b0bcd0',opacity:s.o}}))
   );
 }
 
-function QuoteModal({quotes,onSave,onClose}){
-  const [list,setList]=useState(quotes.map(q=>({...q})));
-  const [editId,setEditId]=useState(null);
-  const [form,setForm]=useState({text:'',author:''});
-  const save=()=>{
-    if(!form.text.trim())return;
-    if(editId!==null)setList(list.map(q=>q.id===editId?{...q,...form}:q));
+/* ── QUOTES ── */
+const ALL_QUOTES = [
+  {id:1,  text:"What gets measured gets managed. What gets journaled gets mastered.", author:"Peter Drucker — Adapted"},
+  {id:2,  text:"The undisciplined trader's biggest enemy is himself. The journal is the mirror.", author:"Mark Douglas"},
+  {id:3,  text:"Every trade is a lesson. Every journal entry is a weapon.", author:"Avkar"},
+  {id:4,  text:"Consistency is not about being perfect. It's about showing up the same way every day.", author:"Avkar"},
+  {id:5,  text:"The goal of a successful trader is to make the best trades. Money is secondary.", author:"Alexander Elder"},
+  {id:6,  text:"It's not whether you're right or wrong, but how much you make when right and how little you lose when wrong.", author:"George Soros"},
+  {id:7,  text:"Your body is your first chart. Read it before you read the market.", author:"Avkar"},
+  {id:8,  text:"The difference between a professional and an amateur is not skill. It's self-awareness.", author:"Avkar"},
+  {id:9,  text:"You do not rise to the level of your goals. You fall to the level of your systems.", author:"James Clear"},
+  {id:10, text:"Win the morning, win the session.", author:"Avkar"},
+  {id:11, text:"The mind that is not grounded will always be moved by the market.", author:"Avkar"},
+  {id:12, text:"Risk management is not a strategy. It is your character.", author:"Avkar"},
+  {id:13, text:"Every time you honour your stop loss, you are voting for the trader you want to become.", author:"Avkar"},
+  {id:14, text:"Amateurs think about how much they can make. Professionals think about how much they can lose.", author:"Jack Schwager"},
+  {id:15, text:"The market does not know you exist. Your edge is in knowing yourself.", author:"Avkar"},
+  {id:16, text:"A peak performance trader is one who has accepted full responsibility for every trade.", author:"Mark Douglas"},
+  {id:17, text:"The Creator does not react. The Creator decides.", author:"Avkar"},
+  {id:18, text:"Wanderer drifts. Creator builds. Today you choose.", author:"Avkar"},
+];
+
+/* ── GUIDE DATA ── */
+/* pause:true = section needs reflection, shown in amber  */
+/* pause:false = quick factual answer, shown in cream     */
+
+const PM_GUIDE = [
+  {s:"SLEEP & BODY",       c:"var(--teal)",   pause:false, i:["Sleep hours","Quality — poor / ok / good","Alcohol last night?","Energy level 1–10","Supplements taken?","ADHD med taken?"]},
+  {s:"RITUALS DONE",       c:"var(--teal)",   pause:false, i:["Cold water done?","Light exercise done?","Visualization done?","Body scan done?","Identity statement read?","Alarm ritual done?","Music on?"]},
+  {s:"MENTAL STATE",       c:"var(--red)",    pause:true,  i:["Wanderer (V1) or Avkar · Creator (V2)?","What is my inner talk this morning?","Any active Wanderer belief right now?","Nervous system state in one word","Financial stress level 1–10","Feeling survival pressure today?","Can I lose calmly today?"]},
+  {s:"TODAY'S INTENTION",  c:"var(--amber)",  pause:true,  i:["One word for today","Session focus","My Creator behaviour goal today","What to avoid — be specific","One rule I will protect no matter what"]},
+  {s:"RISK PARAMETERS",    c:"var(--red)",    pause:false, i:["Max daily loss $","Profit target $","Max number of trades","Max contracts per trade","Hard cutoff time"]},
+  {s:"MARKET CONTEXT",     c:"var(--purple)", pause:false, i:["Major news today?","Pre-market NQ move","Gap up or gap down","Overall trend bias","Correlated markets check"]},
+  {s:"SETUP PLAN",         c:"var(--teal)",   pause:false, i:["Primary setup today","Key support level","Key resistance level","Entry trigger","Confirmation signal","Invalidation level"]},
+];
+
+const TL_GUIDE = [
+  {s:"TRADE BASICS",       c:"var(--teal)",   pause:false, i:["Time of entry","Instrument","Long or short","Entry price","Contracts or size","Setup name"]},
+  {s:"PRE-ENTRY CHECK",    c:"var(--amber)",  pause:true,  i:["Was signal confirmed?","Did I hesitate — yes or no?","Was FOMO involved?","Did I chase the entry?","Wanderer (V1) or Avkar · Creator (V2) mindset?","What did my body feel at entry?"]},
+  {s:"EXECUTION",          c:"var(--teal)",   pause:false, i:["Entry quality 1–10","Did I follow the exact plan?","Trigger type used","Initial stop loss placed?","Target set before entering?"]},
+  {s:"TRADE MANAGEMENT",   c:"var(--red)",    pause:true,  i:["Did I move stop loss too early?","Did I scale out at target?","Did I add to position?","Did I exit early — why?","Did I hold through the noise?"]},
+  {s:"EXIT",               c:"var(--green)",  pause:false, i:["Exit time","Exit price","Gross P&L $","Exit reason","Target hit — yes or no?","Slippage?"]},
+  {s:"POST-TRADE REFLECT", c:"var(--purple)", pause:true,  i:["Grade — A / B / C / D","Which rule did I break if any?","Best moment in this trade","What to fix next time","Emotion at exit","Should I repeat this setup?"]},
+];
+
+const EOD_GUIDE = [
+  {s:"SESSION STATS — TAB 3",    c:"var(--teal)",   pause:false, i:["Start and end time","Total trades taken","Winners and losers count","Gross P&L $","Fees and commissions","Net P&L $","Win rate %"]},
+  {s:"RISK COMPLIANCE",          c:"var(--red)",    pause:false, i:["Did I hit daily stop — yes or no?","Exceeded trade limit?","Largest single loss $","Largest single win $","Max drawdown today $","Did I respect the cutoff?"]},
+  {s:"BEST TRADE TODAY",         c:"var(--green)",  pause:true,  i:["Setup name","What worked in this trade","Execution grade","P&L on this trade","Could I have held longer?","Will I repeat this?"]},
+  {s:"WORST TRADE TODAY",        c:"var(--red)",    pause:true,  i:["Setup name","What went wrong","Was it in the plan?","P&L on this trade","Was it avoidable — how?","Which rule did I break?"]},
+  {s:"PATTERN REVIEW",           c:"var(--purple)", pause:true,  i:["Most common mistake today","Best setup type today","Did I overtrade?","Did I revenge trade?","What time were my best trades?","What time were my worst trades?"]},
+  {s:"EMOTIONAL ARC — TAB 4",    c:"var(--amber)",  pause:true,  i:["Emotional state at open","Peak emotion of the session","Lowest point emotionally","State at close","Overall arc — rising or falling?"]},
+  {s:"WANDERER AUDIT (V1)",      c:"var(--red)",    pause:true,  i:["How many Wanderer moments today?","Main trigger for Wanderer state","Cost of Wanderer decisions $","How fast did I recover?","Which Wanderer pattern keeps repeating?","Which Creator response did I use?"]},
+  {s:"BODY & PRESENCE",          c:"var(--teal)",   pause:true,  i:["Chest tension level 1–10","Breathing quality today","Was I present or scattered?","Physical energy level","Did my body signal danger before a loss?"]},
+  {s:"IDENTITY CHECK",           c:"var(--purple)", pause:true,  i:["Did I trade like Avkar · Creator today?","Closest Creator moment of the session","Biggest gap between me and Creator","Is my identity statement still true?","One word — who was I today?"]},
+  {s:"LESSONS & GROWTH",         c:"var(--green)",  pause:true,  i:["Number one lesson today","Pattern I now clearly see","Any aha moment?","What I will do differently tomorrow","Am I improving overall — yes or no?"]},
+  {s:"TOMORROW'S PLAN",          c:"var(--amber)",  pause:false, i:["Reset ritual tonight","Focus adjustment for tomorrow","One thing to avoid","Energy plan for the morning","Am I excited to trade tomorrow?"]},
+];
+
+const GUIDES = {premarket:PM_GUIDE, tradelog:TL_GUIDE, eod:EOD_GUIDE};
+const META = {
+  premarket: {label:"PRE-MARKET PREP",    color:"var(--teal)",   sub:"Tab 1 · Before 9:30 AM"},
+  tradelog:  {label:"TRADE LOG",          color:"var(--amber)",  sub:"Tab 2 · After each trade"},
+  eod:       {label:"END OF DAY",         color:"var(--green)",  sub:"Tabs 3 + 4 · After session"},
+};
+
+/* ── GUIDE PANEL ── */
+function GuidePanel({guide}){
+  return h('div',{style:{width:'30%',flexShrink:0,overflowY:'auto',padding:'16px 12px 16px 18px',borderRight:'1px solid var(--border)',height:'100%'}},
+    guide.map(b=>
+      h('div',{key:b.s,style:{marginBottom:20}},
+        /* section header */
+        h('div',{style:{display:'flex',alignItems:'center',gap:8,marginBottom:9,paddingBottom:6,borderBottom:'1px solid var(--border)'}},
+          h('div',{style:{width:8,height:8,borderRadius:'50%',background:b.c,flexShrink:0}}),
+          h('span',{style:{color:b.c,fontSize:10,letterSpacing:2,fontFamily:'monospace',fontWeight:700}},b.s),
+          b.pause && h('span',{style:{marginLeft:'auto',background:'rgba(212,149,106,.15)',border:'1px solid rgba(212,149,106,.3)',color:'var(--amber-l)',fontSize:9,fontFamily:'monospace',padding:'1px 7px',borderRadius:10,letterSpacing:1}},'PAUSE')
+        ),
+        /* items */
+        b.i.map(item=>
+          h('div',{key:item,style:{display:'flex',alignItems:'flex-start',gap:10,marginBottom:8}},
+            h('div',{style:{width:b.pause?7:5,height:b.pause?7:5,borderRadius:'50%',background:b.pause?b.c:'var(--border2)',flexShrink:0,marginTop:5}}),
+            h('span',{style:{
+              fontSize: b.pause ? 15 : 14,
+              fontWeight: b.pause ? 700 : 500,
+              color: b.pause ? 'var(--amber-l)' : 'var(--text1)',
+              lineHeight: 1.5,
+              fontFamily: 'monospace',
+            }},item)
+          )
+        )
+      )
+    )
+  );
+}
+
+/* ── QUOTE MODAL ── */
+function QuoteModal({quotes, onSave, onClose}){
+  const [list,setList] = useState(quotes.map(q=>({...q})));
+  const [editId,setEditId] = useState(null);
+  const [form,setForm] = useState({text:'',author:''});
+  const save = () => {
+    if(!form.text.trim()) return;
+    if(editId!==null) setList(list.map(q=>q.id===editId?{...q,...form}:q));
     else setList([...list,{...form,id:Date.now()}]);
-    setEditId(null);setForm({text:'',author:''});
+    setEditId(null); setForm({text:'',author:''});
   };
-  return h('div',{style:{position:'fixed',inset:0,background:'rgba(12,15,22,.95)',zIndex:300,display:'flex',alignItems:'center',justifyContent:'center',padding:16}},
-    h('div',{style:{background:'var(--bg2)',border:'1px solid var(--border2)',borderRadius:16,padding:22,width:'100%',maxWidth:500,maxHeight:'86vh',overflowY:'auto'}},
+  return h('div',{style:{position:'fixed',inset:0,background:'rgba(10,13,20,.96)',zIndex:300,display:'flex',alignItems:'center',justifyContent:'center',padding:16}},
+    h('div',{style:{background:'var(--bg2)',border:'1px solid var(--border2)',borderRadius:16,padding:22,width:'100%',maxWidth:520,maxHeight:'88vh',overflowY:'auto'}},
       h('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:18}},
-        h('span',{style:{color:'var(--amber)',fontFamily:'monospace',fontSize:13,letterSpacing:2}},'✦ MANAGE QUOTES'),
-        h('button',{onClick:onClose,style:{background:'none',border:'none',color:'var(--text3)',fontSize:22}},'✕')
+        h('span',{style:{color:'var(--amber)',fontFamily:'monospace',fontSize:13,letterSpacing:2,fontWeight:700}},'✦  MANAGE QUOTES'),
+        h('button',{onClick:onClose,style:{background:'none',border:'none',color:'var(--text3)',fontSize:24,lineHeight:1}},'✕')
       ),
-      list.map(q=>h('div',{key:q.id,style:{background:'var(--bg)',border:'1px solid var(--border)',borderRadius:10,padding:'12px 14px',marginBottom:10}},
-        h('div',{style:{color:'var(--text2)',fontStyle:'italic',fontSize:14,marginBottom:7,lineHeight:1.6}},'"'+q.text+'"'),
+      list.map(q=>h('div',{key:q.id,style:{background:'var(--bg)',border:'1px solid var(--border)',borderRadius:10,padding:'13px 15px',marginBottom:10}},
+        h('div',{style:{color:'var(--text2)',fontStyle:'italic',fontSize:14,marginBottom:8,lineHeight:1.65}},'"'+q.text+'"'),
         h('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'center'}},
           h('span',{style:{color:'var(--amber)',fontFamily:'monospace',fontSize:11}},q.author?'— '+q.author:''),
           h('div',{style:{display:'flex',gap:8}},
-            h('button',{onClick:()=>{setEditId(q.id);setForm({text:q.text,author:q.author||''});},style:{background:'none',border:'1px solid var(--border2)',color:'var(--text3)',borderRadius:7,padding:'3px 12px',fontSize:12}},'edit'),
-            h('button',{onClick:()=>setList(list.filter(x=>x.id!==q.id)),style:{background:'none',border:'1px solid rgba(220,80,80,.3)',color:'var(--red)',borderRadius:7,padding:'3px 12px',fontSize:12}},'×')
+            h('button',{onClick:()=>{setEditId(q.id);setForm({text:q.text,author:q.author||''});},style:{background:'none',border:'1px solid var(--border2)',color:'var(--text3)',borderRadius:7,padding:'4px 14px',fontSize:13}},'edit'),
+            h('button',{onClick:()=>setList(list.filter(x=>x.id!==q.id)),style:{background:'none',border:'1px solid rgba(220,80,80,.3)',color:'var(--red)',borderRadius:7,padding:'4px 14px',fontSize:13}},'×')
           )
         )
       )),
-      h('div',{style:{marginTop:14,background:'var(--bg)',border:'1px solid var(--border)',borderRadius:10,padding:16}},
-        h('div',{style:{color:'var(--amber)',fontFamily:'monospace',fontSize:10,letterSpacing:1,marginBottom:10}},editId!==null?'EDITING':'+ ADD QUOTE'),
-        h('textarea',{value:form.text,onChange:ev=>setForm({...form,text:ev.target.value}),placeholder:'Quote text...',style:{height:60,marginBottom:8,fontSize:13,fontStyle:'italic',background:'var(--bg2)',border:'1px solid var(--border)',borderRadius:8,color:'var(--text1)',padding:'8px 10px',outline:'none',lineHeight:1.6,resize:'none',width:'100%',fontFamily:'Georgia,serif'}}),
-        h('input',{value:form.author,onChange:ev=>setForm({...form,author:ev.target.value}),placeholder:'Author (optional)',style:{width:'100%',background:'var(--bg2)',border:'1px solid var(--border)',borderRadius:8,color:'var(--amber-l)',padding:'8px 12px',fontSize:12,fontFamily:'monospace',outline:'none'}}),
-        h('div',{style:{display:'flex',gap:8,marginTop:12}},
-          h('button',{onClick:save,style:{background:'linear-gradient(135deg,var(--amber-d),var(--amber))',border:'none',borderRadius:8,color:'#fff',padding:'9px 20px',fontSize:13,fontWeight:700,letterSpacing:1}},editId!==null?'UPDATE':'ADD'),
-          editId!==null&&h('button',{onClick:()=>{setEditId(null);setForm({text:'',author:''});},style:{background:'none',border:'1px solid var(--border2)',borderRadius:8,color:'var(--text3)',padding:'9px 16px',fontSize:13}},'CANCEL')
+      h('div',{style:{marginTop:16,background:'var(--bg)',border:'1px solid var(--border)',borderRadius:10,padding:16}},
+        h('div',{style:{color:'var(--amber)',fontFamily:'monospace',fontSize:11,letterSpacing:1,marginBottom:10,fontWeight:700}},editId!==null?'EDITING QUOTE':'+ ADD QUOTE'),
+        h('textarea',{value:form.text,onChange:ev=>setForm({...form,text:ev.target.value}),placeholder:'Quote text...',style:{height:64,marginBottom:9,fontSize:14,fontStyle:'italic',background:'var(--bg2)',border:'1px solid var(--border)',borderRadius:8,color:'var(--text1)',padding:'9px 12px',outline:'none',lineHeight:1.65,resize:'none',width:'100%',fontFamily:'Georgia,serif'}}),
+        h('input',{value:form.author,onChange:ev=>setForm({...form,author:ev.target.value}),placeholder:'Author (optional)',style:{width:'100%',background:'var(--bg2)',border:'1px solid var(--border)',borderRadius:8,color:'var(--amber-l)',padding:'9px 12px',fontSize:13,fontFamily:'monospace'}}),
+        h('div',{style:{display:'flex',gap:10,marginTop:12}},
+          h('button',{onClick:save,style:{background:'linear-gradient(135deg,var(--amber-d),var(--amber))',border:'none',borderRadius:9,color:'#fff',padding:'10px 22px',fontSize:14,fontWeight:700,letterSpacing:1}},editId!==null?'UPDATE':'ADD'),
+          editId!==null&&h('button',{onClick:()=>{setEditId(null);setForm({text:'',author:''});},style:{background:'none',border:'1px solid var(--border2)',borderRadius:9,color:'var(--text3)',padding:'10px 18px',fontSize:14}},'CANCEL')
         )
       ),
-      h('button',{onClick:()=>onSave(list),style:{width:'100%',marginTop:14,background:'linear-gradient(135deg,var(--amber-d),var(--amber))',border:'none',borderRadius:10,color:'#fff',padding:'13px',fontFamily:'monospace',fontSize:13,fontWeight:700,letterSpacing:2}},'SAVE QUOTES')
+      h('button',{onClick:()=>onSave(list),style:{width:'100%',marginTop:16,background:'linear-gradient(135deg,var(--amber-d),var(--amber))',border:'none',borderRadius:11,color:'#fff',padding:'14px',fontFamily:'monospace',fontSize:14,fontWeight:900,letterSpacing:2}},'SAVE QUOTES')
     )
   );
 }
 
-function JournalScreen({session,onBack}){
-  const [showGuide,setShowGuide]=useState(true);
-  const [text,setText]=useState('');
-  const [status,setStatus]=useState('idle');
-  const meta=META[session];
-  const guide=GUIDES[session];
-  const words=text.trim()?text.trim().split(/\s+/).length:0;
-  const handleSave=async()=>{setStatus('saving');await new Promise(r=>setTimeout(r,1400));setStatus('saved');setTimeout(()=>setStatus('idle'),3000);};
-  return h('div',{style:{display:'flex',flexDirection:'column',height:'100vh',position:'relative',zIndex:1,overflow:'hidden'}},
-    h('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'14px 22px',borderBottom:'1px solid var(--border)',flexShrink:0,background:'var(--bg2)'}},
-      h('span',{style:{color:'var(--amber)',fontFamily:'monospace',fontSize:14,letterSpacing:2}},'✦  AVKAR · JOURNAL'),
+/* ── JOURNAL SCREEN ── */
+function JournalScreen({session, onBack}){
+  const [showGuide,setShowGuide] = useState(true);
+  const [text,setText] = useState('');
+  const [status,setStatus] = useState('idle');
+  const meta = META[session];
+  const guide = GUIDES[session];
+  const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+  const handleSave = async () => {
+    setStatus('saving');
+    await new Promise(r=>setTimeout(r,1400));
+    setStatus('saved');
+    setTimeout(()=>setStatus('idle'),3000);
+  };
+  return h('div',{style:{display:'flex',flexDirection:'column',height:'100vh',height:'100dvh',position:'relative',zIndex:1,overflow:'hidden'}},
+    /* header */
+    h('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'13px 22px',borderBottom:'1px solid var(--border)',flexShrink:0,background:'var(--bg2)'}},
+      h('span',{style:{color:'var(--amber)',fontFamily:'monospace',fontSize:14,letterSpacing:2,fontWeight:700}},'✦  AVKAR · JOURNAL'),
       h('button',{className:'btn-nav',onClick:onBack},'← Back')
     ),
+    /* session badge */
     h('div',{style:{padding:'10px 22px',borderBottom:'1px solid var(--border)',flexShrink:0,display:'flex',alignItems:'center',gap:14,background:'var(--bg2)'}},
-      h('span',{style:{background:'var(--bg3)',border:'1px solid var(--border2)',color:meta.color,fontFamily:'monospace',fontSize:11,padding:'4px 14px',borderRadius:20,letterSpacing:2,fontWeight:700}},meta.label),
+      h('span',{style:{background:'var(--bg3)',border:'1px solid var(--border2)',color:meta.color,fontFamily:'monospace',fontSize:11,padding:'4px 16px',borderRadius:20,letterSpacing:2,fontWeight:700}},meta.label),
       h('span',{style:{color:'var(--text3)',fontFamily:'monospace',fontSize:12}},meta.sub)
     ),
-    h('button',{onClick:()=>setShowGuide(v=>!v),style:{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'10px 22px',background:'var(--bg3)',border:'none',borderBottom:'1px solid var(--border)',color:'var(--text2)',fontFamily:'monospace',fontSize:13,flexShrink:0,width:'100%',textAlign:'left',letterSpacing:1}},
-      h('span',null,'📋  '+(showGuide?'Hide':'Show')+' Speaking Guide'),
-      h('span',{style:{opacity:.5,fontSize:11}},showGuide?'▲':'▼')
+    /* toggle guide */
+    h('button',{onClick:()=>setShowGuide(v=>!v),style:{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'10px 22px',background:'var(--bg3)',border:'none',borderBottom:'1px solid var(--border)',color:'var(--text2)',fontFamily:'monospace',fontSize:14,fontWeight:700,flexShrink:0,width:'100%',textAlign:'left',letterSpacing:1}},
+      h('span',null,'📋   '+(showGuide?'Hide':'Show')+' Speaking Guide'),
+      h('span',{style:{opacity:.45,fontSize:12}},showGuide?'▲':'▼')
     ),
-    h('div',{style:{flex:1,display:'flex',overflow:'hidden'}},
-      showGuide&&h(GuidePanel,{guide}),
-      h('div',{style:{flex:1,display:'flex',flexDirection:'column',padding:'14px 18px',position:'relative',overflow:'hidden'}},
-        h('div',{style:{position:'relative',flex:1,display:'flex',flexDirection:'column'}},
-          h('textarea',{value:text,onChange:ev=>setText(ev.target.value),placeholder:'Tap here → tap 🎤 mic on keyboard → speak freely about all the topics in the guide…',style:{flex:1,height:'100%',paddingRight:'46px'}}),
-          h('div',{style:{position:'absolute',top:14,right:14,fontSize:16,pointerEvents:'none',opacity:.28}},'🎤'),
-          h('div',{style:{position:'absolute',bottom:11,right:14,color:'var(--text3)',fontFamily:'monospace',fontSize:11}},words+' words')
+    /* body */
+    h('div',{style:{flex:1,display:'flex',overflow:'hidden',minHeight:0}},
+      showGuide && h(GuidePanel,{guide}),
+      h('div',{style:{flex:1,display:'flex',flexDirection:'column',padding:'14px 18px',overflow:'hidden'}},
+        h('div',{style:{position:'relative',flex:1,display:'flex',flexDirection:'column',minHeight:0}},
+          h('textarea',{value:text,onChange:ev=>setText(ev.target.value),placeholder:'Tap here → tap 🎤 mic on keyboard → speak freely about all topics in the guide…',style:{flex:1,height:'100%',paddingRight:'48px'}}),
+          h('div',{style:{position:'absolute',top:14,right:14,fontSize:17,pointerEvents:'none',opacity:.25}},'🎤'),
+          h('div',{style:{position:'absolute',bottom:11,right:14,color:'var(--text3)',fontFamily:'monospace',fontSize:12}},words+' words')
         )
       )
     ),
-    h('button',{onClick:handleSave,disabled:status==='saving',style:{padding:'18px',background:status==='saved'?'linear-gradient(135deg,#3a9a6a,#5ec490)':status==='saving'?'var(--bg3)':'linear-gradient(135deg,var(--amber-d),var(--amber))',border:'none',color:status==='saving'?'var(--amber)':'#fff',fontFamily:'monospace',fontSize:13,fontWeight:900,letterSpacing:3,flexShrink:0,transition:'all .3s'}},
-      status==='saved'?'✓ SAVED TO GOOGLE SHEETS':status==='saving'?'EXTRACTING & SAVING...':'EXTRACT & SAVE TO GOOGLE SHEETS →'
+    /* save button — safe area aware */
+    h('div',{style:{flexShrink:0,paddingBottom:'env(safe-area-inset-bottom)'}},
+      h('button',{onClick:handleSave,disabled:status==='saving',style:{width:'100%',padding:'19px',background:status==='saved'?'linear-gradient(135deg,#3a9a6a,#5ec490)':status==='saving'?'var(--bg3)':'linear-gradient(135deg,var(--amber-d),var(--amber))',border:'none',color:status==='saving'?'var(--amber)':'#fff',fontFamily:'monospace',fontSize:14,fontWeight:900,letterSpacing:3,transition:'all .3s',display:'block'}},
+        status==='saved'?'✓  SAVED TO GOOGLE SHEETS':status==='saving'?'EXTRACTING & SAVING...':'EXTRACT & SAVE TO GOOGLE SHEETS →'
+      )
     )
   );
 }
 
-function SessionSelector({onSelect,onHome}){
-  const sessions=[
-    {id:'premarket',icon:'🌅',label:'Pre Market',color:'var(--teal)',meta:'Tab 1 · Before 9:30 AM'},
-    {id:'tradelog',icon:'📊',label:'Trade Log',color:'var(--amber)',meta:'Tab 2 · After each trade'},
-    {id:'eod',icon:'🌙',label:'End of Day',color:'var(--green)',meta:'Tabs 3+4 · After session'},
+/* ── SESSION SELECTOR ── */
+function SessionSelector({onSelect, onHome}){
+  const sessions = [
+    {id:'premarket', icon:'🌅', label:'Pre Market',  color:'var(--teal)',   meta:'Tab 1 · Before 9:30 AM'},
+    {id:'tradelog',  icon:'📊', label:'Trade Log',   color:'var(--amber)',  meta:'Tab 2 · After each trade'},
+    {id:'eod',       icon:'🌙', label:'End of Day',  color:'var(--green)',  meta:'Tabs 3+4 · After session'},
   ];
-  return h('div',{style:{position:'relative',zIndex:1,height:'100vh',background:'var(--bg)',display:'flex',flexDirection:'column'}},
-    h('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'14px 22px',borderBottom:'1px solid var(--border)',background:'var(--bg2)',flexShrink:0}},
-      h('span',{style:{color:'var(--amber)',fontFamily:'monospace',fontSize:14,letterSpacing:2}},'✦  AVKAR · JOURNAL'),
+  return h('div',{style:{position:'relative',zIndex:1,height:'100vh',height:'100dvh',background:'var(--bg)',display:'flex',flexDirection:'column'}},
+    h('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'13px 22px',borderBottom:'1px solid var(--border)',background:'var(--bg2)',flexShrink:0}},
+      h('span',{style:{color:'var(--amber)',fontFamily:'monospace',fontSize:14,letterSpacing:2,fontWeight:700}},'✦  AVKAR · JOURNAL'),
       h('button',{className:'btn-nav',onClick:onHome},'🏠  Home')
     ),
-    h('div',{style:{padding:'26px 22px',overflowY:'auto',flex:1}},
-      h('div',{style:{borderLeft:'3px solid var(--amber-d)',paddingLeft:16,marginBottom:32,color:'var(--text2)',fontStyle:'italic',fontSize:16,lineHeight:1.8}},
+    h('div',{style:{padding:'28px 22px',overflowY:'auto',flex:1}},
+      h('div',{style:{borderLeft:'3px solid var(--amber-d)',paddingLeft:18,marginBottom:34,color:'var(--text2)',fontStyle:'italic',fontSize:16,lineHeight:1.8}},
         '"The undisciplined trader\'s biggest enemy is himself. The journal is the mirror."',
-        h('div',{style:{color:'var(--text3)',fontFamily:'monospace',fontSize:11,marginTop:7,letterSpacing:1}},'— Mark Douglas')
+        h('div',{style:{color:'var(--text3)',fontFamily:'monospace',fontSize:12,marginTop:8,letterSpacing:1}},'— Mark Douglas')
       ),
-      h('div',{style:{color:'var(--text1)',fontSize:22,fontWeight:700,marginBottom:6,letterSpacing:.5}},'What are you logging?'),
-      h('div',{style:{color:'var(--amber)',fontFamily:'monospace',fontSize:11,letterSpacing:2,marginBottom:24}},'CHOOSE YOUR SESSION TYPE'),
+      h('div',{style:{color:'var(--text1)',fontSize:23,fontWeight:700,marginBottom:7,letterSpacing:.5}},'What are you logging?'),
+      h('div',{style:{color:'var(--amber)',fontFamily:'monospace',fontSize:12,letterSpacing:2,marginBottom:26}},'CHOOSE YOUR SESSION TYPE'),
       h('div',{style:{display:'flex',gap:16,flexWrap:'wrap'}},
-        sessions.map(s=>h('button',{key:s.id,onClick:()=>onSelect(s.id),style:{flex:'1 1 160px',minHeight:120,background:'var(--bg2)',border:'1.5px solid var(--border2)',borderRadius:14,color:s.color,fontSize:16,fontWeight:700,letterSpacing:1,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:10,padding:18,transition:'background .15s',fontFamily:'Georgia,serif'}},
-          h('span',{style:{fontSize:26}},s.icon),
+        sessions.map(s=>h('button',{key:s.id,onClick:()=>onSelect(s.id),style:{flex:'1 1 170px',minHeight:124,background:'var(--bg2)',border:'1.5px solid var(--border2)',borderRadius:14,color:s.color,fontSize:17,fontWeight:700,letterSpacing:1,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:10,padding:20,fontFamily:'Georgia,serif',transition:'background .15s'}},
+          h('span',{style:{fontSize:28}},s.icon),
           h('span',null,s.label),
-          h('span',{style:{color:'var(--text3)',fontSize:11,fontFamily:'monospace',fontWeight:400,marginTop:2}},s.meta)
+          h('span',{style:{color:'var(--text3)',fontSize:12,fontFamily:'monospace',fontWeight:400,marginTop:2}},s.meta)
         ))
       )
     )
   );
 }
 
-function Splash({quotes,onStart,onManageQuotes}){
-  const [idx,setIdx]=useState(0);
-  const [fade,setFade]=useState(true);
-  const [now,setNow]=useState(new Date());
-  useEffect(()=>{const t=setInterval(()=>setNow(new Date()),30000);return()=>clearInterval(t);},[]);
+/* ── SPLASH ── */
+function Splash({quotes, onStart, onManageQuotes}){
+  const [idx,setIdx] = useState(0);
+  const [fade,setFade] = useState(true);
+  const [now,setNow] = useState(new Date());
   useEffect(()=>{
-    if(quotes.length<=1)return;
-    const t=setInterval(()=>{setFade(false);setTimeout(()=>{setIdx(i=>(i+1)%quotes.length);setFade(true);},350);},7000);
-    return()=>clearInterval(t);
+    const t = setInterval(()=>setNow(new Date()), 30000);
+    return ()=>clearInterval(t);
+  },[]);
+  useEffect(()=>{
+    if(quotes.length<=1) return;
+    const t = setInterval(()=>{
+      setFade(false);
+      setTimeout(()=>{ setIdx(i=>(i+1)%quotes.length); setFade(true); }, 400);
+    }, 60000); /* rotate every 60 seconds */
+    return ()=>clearInterval(t);
   },[quotes.length]);
-  const q=quotes[idx]||quotes[0];
-  const ds=now.toLocaleDateString('en-US',{weekday:'long',month:'short',day:'numeric'});
-  const ts=now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
-  return h('div',{style:{height:'100vh',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',position:'relative',zIndex:1,padding:'40px 32px'}},
-    h('div',{style:{fontFamily:'monospace',fontSize:12,letterSpacing:5,color:'var(--amber)',marginBottom:52,opacity:.9,display:'flex',alignItems:'center',gap:12}},
-      h('span',{style:{fontSize:14}},'✦'),'AVKAR',h('span',{style:{opacity:.3}},'·'),'TRADING JOURNAL'
+  const q = quotes[idx] || quotes[0];
+  const ds = now.toLocaleDateString('en-US',{weekday:'long',month:'short',day:'numeric'});
+  const ts = now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
+  return h('div',{style:{height:'100vh',height:'100dvh',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',position:'relative',zIndex:1,padding:'40px 36px'}},
+    h('div',{style:{fontFamily:'monospace',fontSize:12,letterSpacing:5,color:'var(--amber)',marginBottom:54,opacity:.9,display:'flex',alignItems:'center',gap:12}},
+      h('span',{style:{fontSize:15}},'✦'), 'AVKAR', h('span',{style:{opacity:.3}},'·'), 'TRADING JOURNAL'
     ),
-    h('div',{style:{textAlign:'center',maxWidth:560,marginBottom:58,transition:'opacity .35s',opacity:fade?1:0}},
-      h('div',{style:{color:'var(--text1)',fontFamily:'Georgia,serif',fontSize:24,fontStyle:'italic',lineHeight:1.8,marginBottom:18}},'"'+q.text+'"'),
-      q.author&&h('div',{style:{color:'var(--amber-d)',fontFamily:'monospace',fontSize:11,letterSpacing:3}},'— '+q.author.toUpperCase())
+    h('div',{style:{textAlign:'center',maxWidth:580,marginBottom:60,transition:'opacity .4s',opacity:fade?1:0}},
+      h('div',{style:{color:'var(--text1)',fontFamily:'Georgia,serif',fontSize:24,fontStyle:'italic',lineHeight:1.8,marginBottom:20}},'"'+q.text+'"'),
+      q.author && h('div',{style:{color:'var(--amber-d)',fontFamily:'monospace',fontSize:12,letterSpacing:3}},'— '+q.author.toUpperCase())
     ),
     h('button',{className:'btn-cta',onClick:onStart},'START JOURNAL SESSION'),
-    h('div',{style:{display:'flex',gap:12,marginTop:20}},
-      h('button',{onClick:onManageQuotes,style:{background:'none',border:'1px solid var(--border2)',color:'var(--text3)',borderRadius:10,padding:'9px 20px',fontFamily:'monospace',fontSize:12,letterSpacing:1}},'✎  Quotes'),
-      h('button',{style:{background:'none',border:'1px solid var(--border2)',color:'var(--text3)',borderRadius:10,padding:'9px 20px',fontFamily:'monospace',fontSize:12,letterSpacing:1}},'⚙  Settings')
+    h('div',{style:{display:'flex',gap:14,marginTop:22}},
+      h('button',{onClick:onManageQuotes,style:{background:'none',border:'1px solid var(--border2)',color:'var(--text3)',borderRadius:11,padding:'11px 22px',fontFamily:'monospace',fontSize:13,letterSpacing:1}},'✎  Quotes'),
+      h('button',{style:{background:'none',border:'1px solid var(--border2)',color:'var(--text3)',borderRadius:11,padding:'11px 22px',fontFamily:'monospace',fontSize:13,letterSpacing:1}},'⚙  Settings')
     ),
-    h('div',{style:{position:'absolute',bottom:28,color:'var(--text3)',fontFamily:'monospace',fontSize:11,letterSpacing:2}},ds+' · '+ts)
+    h('div',{style:{position:'absolute',bottom:30,color:'var(--text3)',fontFamily:'monospace',fontSize:12,letterSpacing:2}},ds+' · '+ts)
   );
 }
 
+/* ── APP ── */
 function App(){
-  const [screen,setScreen]=useState('splash');
-  const [session,setSession]=useState(null);
-  const [quotes,setQuotes]=useState(QUOTES);
-  const [showQM,setShowQM]=useState(false);
-  return h('div',{style:{height:'100vh',background:'var(--bg)',overflow:'hidden'}},
+  const [screen,setScreen]   = useState('splash');
+  const [session,setSession] = useState(null);
+  const [quotes,setQuotes]   = useState(ALL_QUOTES);
+  const [showQM,setShowQM]   = useState(false);
+  return h('div',{style:{height:'100vh',height:'100dvh',background:'var(--bg)',overflow:'hidden'}},
     h(Stars),
-    showQM&&h(QuoteModal,{quotes,onSave:q=>{setQuotes(q);setShowQM(false);},onClose:()=>setShowQM(false)}),
-    screen==='splash'&&h(Splash,{quotes,onStart:()=>setScreen('select'),onManageQuotes:()=>setShowQM(true)}),
-    screen==='select'&&h(SessionSelector,{onSelect:s=>{setSession(s);setScreen('journal');},onHome:()=>setScreen('splash')}),
-    screen==='journal'&&h(JournalScreen,{session,onBack:()=>setScreen('select')})
+    showQM && h(QuoteModal,{quotes,onSave:q=>{setQuotes(q);setShowQM(false);},onClose:()=>setShowQM(false)}),
+    screen==='splash'  && h(Splash,{quotes,onStart:()=>setScreen('select'),onManageQuotes:()=>setShowQM(true)}),
+    screen==='select'  && h(SessionSelector,{onSelect:s=>{setSession(s);setScreen('journal');},onHome:()=>setScreen('splash')}),
+    screen==='journal' && h(JournalScreen,{session,onBack:()=>setScreen('select')})
   );
 }
 ReactDOM.createRoot(document.getElementById('root')).render(h(App));
