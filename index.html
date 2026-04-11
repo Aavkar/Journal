@@ -337,7 +337,7 @@ function Splash({quotes, onStart, onManageQuotes}){
     if(quotes.length<=1) return;
     const t = setInterval(()=>{
       setFade(false);
-      setTimeout(()=>{ setIdx(i=>(i+1)%quotes.length); setFade(true); }, 400);
+      setTimeout(()=>{ setIdx(()=>Math.floor(Math.random()*quotes.length)); setFade(true); }, 400);
     }, 10000); /* rotate every 10 seconds */
     return ()=>clearInterval(t);
   },[quotes.length]);
