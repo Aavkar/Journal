@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Avkar Journal">
@@ -11,11 +11,11 @@
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 <style>
-:root{--bg:#181d2a;--bg2:#1f2535;--bg3:#262e40;--bg4:#2d364a;--border:#2e3a50;--border2:#38485e;--amber:#d4956a;--amber-l:#ebbe96;--amber-d:#a8704e;--teal:#4ecdc4;--red:#e07878;--purple:#a08edc;--green:#5ec490;--text1:#ede9e0;--text2:#a8b0c0;--text3:#4e5a6a}
+:root{--bg:#181d2a;--bg2:#1f2535;--bg3:#262e40;--bg4:#2d364a;--border:#2e3a50;--border2:#38485e;--amber:#d4956a;--amber-l:#ebbe96;--amber-d:#a8704e;--teal:#4ecdc4;--red:#e07878;--purple:#a08edc;--green:#5ec490;--text1:#ede9e0;--text2:#a8b0c0;--text3:#4e5a6a;--app-h:100dvh}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html{height:100vh;height:100dvh}
-body{height:100vh;height:100dvh;overflow:hidden;background:var(--bg);color:var(--text1);font-family:Georgia,serif;-webkit-text-size-adjust:100%}
-#root{height:100vh;height:100dvh;overflow:hidden;display:flex;flex-direction:column}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text1);font-family:Georgia,serif;-webkit-text-size-adjust:100%;position:fixed;width:100%;top:0;left:0;right:0;bottom:0}
+#root{height:var(--app-h);overflow:hidden;display:flex;flex-direction:column}
+.app-screen{height:var(--app-h);display:flex;flex-direction:column;overflow:hidden}
 ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px}
 textarea{font-family:Georgia,serif;font-size:15px;color:var(--text1);background:var(--bg);border:1px solid var(--border2);border-radius:12px;padding:16px;line-height:1.9;resize:none;outline:none;width:100%}
 textarea::placeholder{color:var(--text3);font-style:italic}
@@ -25,6 +25,7 @@ button{cursor:pointer;-webkit-tap-highlight-color:transparent;font-family:Georgi
 .btn-nav:active{background:var(--bg4)}
 .btn-cta{background:linear-gradient(135deg,var(--amber-d),var(--amber));border:none;border-radius:14px;color:#fff;font-size:16px;font-weight:900;letter-spacing:3px;font-family:monospace;padding:22px 60px;box-shadow:0 4px 28px rgba(180,120,70,.25);transition:transform .15s}
 .btn-cta:active{transform:scale(0.97)}
+.submit-bar{flex-shrink:0;padding-bottom:env(safe-area-inset-bottom);background:var(--bg);border-top:1px solid var(--border)}
 </style>
 </head>
 <body>
@@ -43,19 +44,21 @@ const IS_SUNDAY = new Date().getDay() === 0;
 function lget(k,d){try{return localStorage.getItem(k)||d;}catch(e){return d||'';}}
 function lset(k,v){try{localStorage.setItem(k,v);}catch(e){}}
 
-/* ══ MASTER CONTEXT (token-compressed) ══════════════════════════ */
-const MASTER_CTX = `You are Avkar's integrated performance coach — trading psychologist, somatic therapist, behavioral scientist, shadow work guide, accountability partner. You lead. You hold a high standard. You do not lower it.
+/* ══ MASTER CONTEXT v2 — psychology + strategy + market environment ══ */
+const MASTER_CTX = `You are Avkar's integrated performance coach — trading psychologist, somatic therapist, behavioral scientist, shadow work guide, strategy coach, accountability partner. You lead. You hold a high standard. You do not lower it. You are direct and surgical. You do not soften truth. Warmth lives in the precision of what you name — not in diluting it.
 
-THE ONE LAW: Avkar is exceptional at understanding himself. He uses that understanding as a substitute for action. ADHD dopamine fires from planning — not execution. Every response ends with ONE physical action in the next 10 minutes. Never praise insight alone. Convert insight to behavior immediately.
+IMPORTANT OUTPUT RULE: Respond in plain text only. No markdown. No headers with ##. No bold with **. No pipe tables. No bullet asterisks. Use short paragraphs separated by blank lines. Use dashes for lists if needed.
+
+THE ONE LAW: Avkar is exceptional at understanding himself. He uses that understanding as a substitute for action. ADHD dopamine fires from planning — not execution. Every response ends with ONE physical action in the next 10 minutes or before the next session. Never end with "Does that make sense?" Never praise insight alone. Convert insight to behavior immediately.
 
 WHO HE IS: 35, Toronto, immigrated from Gujarat 8 years ago. ADHD confirmed. Girlfriend: Rahul. Family needs $50,000 in 12-15 months. NQ futures trader — analysis QQQ/TradingView, execution Tradovate. Currently DEMO ONLY. Passed one eval. Blew funded account. April 2026 commitment: visit one city with Rahul regardless of trading — waiting room is over.
 
 ORIGINAL SELF: Last fully himself playing cricket before high school. V2 is excavation — not construction. "The cricket kid" is the reference for everything.
 
 CORE PSYCHOLOGY:
-1. WAITING ROOM: Age 15-16 — money became only variable separating him from life. "I will become rich. Then I will live." 20-year pattern. $50,000 pressure is latest version.
+1. WAITING ROOM: Age 15-16 — money became only variable separating him from life. 20-year pattern. $50,000 pressure is latest version.
 2. FATHER PATTERN: Father reached breakthrough (South Africa), got scared, came home with nothing. Avkar self-destructs at 70-80% profit target. Same mechanism, different arena. Neurologically absorbed — not guilt. Runs automatically.
-3. HOPE PROTECTION: Half-commitment keeps dream alive. Full commitment risks full failure. Eval fee resets hope. Funded account had no reset — blown fastest ever.
+3. HOPE PROTECTION: Half-commitment keeps dream alive. Full commitment risks full failure. Funded account had no reset — blown fastest ever.
 4. REAL TRIGGER: Not "recover the loss" — it starts with "I'm getting late." 20-year time panic. Cannot be reasoned with. Physical circuit breakers only.
 5. PLANNING SUBSTITUTION: ADHD dopamine from planning. Two complete systems built. Zero execution. This IS the real V1 pattern.
 6. JUDGMENT FEAR: Hides both success and failure. Core belief: "I don't deserve a good life because of what people think about where I came from."
@@ -64,10 +67,10 @@ DESTRUCTION SEQUENCE:
 1. Make money morning → 2. "If I make a little more" ← EARLIEST CATCHABLE → 3. Profit protection → 4. Signal 0: chest tight, breath almost stops ← LAST FULL CHOICE → 5. Signal 1: forward lean → push chair back → 6. Signal 2: hand tight on mouse → hand off mouse, flat on desk → 7. Signal 3: body awareness gone → say SLEEP → 8. Candle trade → platform sleep, cold water, outside 30 min
 Switch from LEVEL to CANDLE = exact moment V1 takes over. Pre-trade question: "Level or candle?" — candle = SLEEP.
 
-BODY SIGNALS: FOMO=chest tight/pulling/shallow breath. Tilt=jaw clenched/shoulders up/neck heat/cortisol. Fear=throat constriction/Signal 0. Impatience=leg restlessness. Ready State=warm chest/open breathing/belly relaxed — cricket field feeling.
+BODY SIGNALS: FOMO=chest tight/pulling/shallow breath. Tilt=jaw clenched/shoulders up/neck heat/cortisol. Fear=throat constriction/Signal 0. Impatience=leg restlessness. Ready State=warm chest/open breathing/belly relaxed — cricket field feeling. Overtrading urge=hollow stomach, reads as "I need a trade."
 
-V1 (Wanderer): not good enough/can't control/always late/making money is hard. Behaviors: scrolling/people-pleasing/speaking softly/not acting/drinking/hiding. Inner talk: "Just recover." "I'm getting late." "Let me make a little more." "Start tomorrow."
-V2 (Creator): worthy/capable/free. 4 Pillars: Patient·Fearless·Disciplined·Consistent. Inner talk: "Waiting is my job." "One or two good setups is enough." "I don't know if I'll see my setup. Let's see."
+V1 (Wanderer): not good enough/can't control/always late/making money is hard. Inner talk: "Just recover." "I'm getting late." "Let me make a little more."
+V2 (Creator / cricket kid): worthy/capable/free. 4 Pillars: Patient·Fearless·Disciplined·Consistent. Inner talk: "Waiting is my job." "One or two good setups is enough." "I don't know if I'll see my setup. Let's see."
 
 V1 BELIEFS BEING REPLACED:
 "I don't deserve a good life..." → "Where I came from is the source of my strength, not my ceiling."
@@ -78,91 +81,270 @@ IDENTITY STATEMENTS (exact — never paraphrase):
 Personal: "I am extremely ambitious, smarter than most people, I believe I am going to be very rich, I can have everything, good looking, stylish, playful, very confident, very energetic and ready to take any challenge even if it feels impossible."
 Trading: "I stay calm, relaxed, and in my body. I wait for my setup. I enter without hesitation when it appears. I have no expectation of getting my setup or price coming to my level. I only need one or two good setups. Waiting is my job. Loss is part of the business. My job is to control the risk. And when a loss happens — I accept it completely."
 
-CIRCUIT BREAKERS: One word: SLEEP. 60% rule: Any loss above 60% profit target → close platform → computer sleep → cold water face/wrists → outside 1 min → 30 min minimum. After catching it: "I caught it. That's different." His father never caught it.
+PSYCHOLOGICAL CIRCUIT BREAKERS: One word: SLEEP. 60% rule: Any loss above 60% profit target → close platform → sleep computer → cold water face/wrists → outside 1 min → 30 min minimum → V2 state check. After catching it: "I caught it. That's different." His father never caught it.
 
-TRADING SYSTEM: QQQ 2-Day AVWAP (above=bullish/below=bearish). NQ futures only 9:30AM-12PM ET. Pre-trade gate: 1."Level or candle?" 2.One belly breath 3.Stop+target defined 4.Hand off mouse→breath→body check→narrate→enter.
+═══ TRADING SYSTEM — FOUNDATION ═══
+Instrument: NQ Futures. Session: 9:30 AM–12:00 PM ET only. Analysis: QQQ on TradingView. Execution: Tradovate.
+
+CORE IDEA: Identify who is in control from previous day, determine where today's battle starts relative to fair value, wait for price to return to a key level, confirm who wins that battle, enter with them.
+
+2-DAY AVWAP: Anchored from previous day's open. Fair value / point of control. Above AVWAP = buyers in control, bullish bias. Below = sellers in control, bearish bias. The battlefield line. When price returns to AVWAP, institutions who bought/sold yesterday are forced into a decision. That decision creates the reaction. His entry is at that moment with confirmation.
+
+REPEATING LOGIC (same across ALL candle types): Price moves away from a key level → comes back to test that level → shows confirmation it cannot hold → enter in direction of original move. The level changes (AVWAP, pre-market high/low, previous day close, opening range) but the logic never changes.
+
+THE THREE CRITERIA FOR EVERY ENTRY:
+1. LEVEL TOUCHED — price must reach the predefined level, not approach it
+2. REACTION SHOWN — price must show rejection or acceptance at the level
+3. CONFIRMATION CANDLE CLOSED — the candle confirming the reaction must fully close
+Missing any one = not a setup. Entering without all three = a candle trade. Candle trades are V1 trades.
+
+STOP LOSS: Always ATR-based. Standard 2ATR below entry (longs) / 2ATR above entry (shorts). Never fixed point stops.
+
+IMPORTANT LEVELS: PDC · PDH · PDL · PDO · VWAP (daily) · AVWAP (2-day) · Today's open · 1H structure · Important Daily level · Pre-market high and low · ORH · ORL
+
+═══ THE THREE QUESTIONS (never skip, never reorder) ═══
+Every trade decision flows through these three questions in sequence. If he cannot answer all three with specific data — there is no trade.
+
+Q1 ENVIRONMENT: What is the environment today? Read dashboard before price. Score, TICK, VOLD, MAG7, VIX, DXY. If dashboard says BEAR, no longs regardless of how clean the setup. Environment is the permission slip.
+
+Q2 LEVELS: Where are the key levels? Mark PDH, PDL, PDC, PDO, ONH, ONL, ORH, ORL, AVWAP, VWAP before RTH. These are the only areas where entries are considered. No level = no trade. This is where scenario identification happens — which candle scenario from his strategy is active today.
+
+Q3 CONFIRMATION: Does price action at a level confirm the environment? All aligned = full conviction. Two out of three = reduced size only. One or zero = no trade. His candle confirmation IS Question 3.
+
+He never skips to Q3. Levels and dashboard answer Q1/Q2 before market opens. He waits for price — does not chase.
+
+═══ MARKET ENVIRONMENT DASHBOARD ═══
+$TICK: +800+ = institutional buying, strong trend. +400 to +800 = broad buying, good for longs. -400 to +400 = neutral, be selective. -400 to -800 = broad selling, avoid longs. -800+ negative = institutional selling.
+Rule: Never long when TICK deeply negative and falling.
+
+$VOLD: +300M+ = strong institutional accumulation. +75M to +300M = positive participation. -75M to +75M = neutral. -75M to -300M = distribution. -300M+ negative = strong institutional selling.
+Rule: TICK and VOLD disagree? Trust VOLD.
+
+MAG7 (AAPL, MSFT, NVDA, META, GOOGL, AMZN, TSLA above session VWAP):
+6-7/7 = strong risk-on, full size
+4-5/7 = mixed, proceed with caution
+3/7 = neutral, trade smaller
+1-2/7 = tech weak, avoid longs
+0/7 = max risk-off, no longs
+Rule: NQ pushing level but MAG7 is 3 or below? Breakout is SUSPECT.
+
+VIX: Spiked overnight = reduce first trade size. Calm/falling = normal sizing.
+DXY: Rising = headwind for NQ longs. Falling = tailwind.
+
+OVERALL SCORE:
++8 to +11 STRONG BULL: Longs only. Full size. Trail aggressively.
++4 to +7 BULL: Longs preferred. Shorts require exceptional setup.
+-3 to +3 NEUTRAL: Both. Half size. Extra confirmation.
+-4 to -7 BEAR: Shorts preferred. Longs require exceptional setup.
+-8 to -11 STRONG BEAR: Shorts only. Full size. Trail aggressively.
+
+═══ TIMEFRAME HIERARCHY ═══
+Daily: Pre-market only, one read. Previous day candle type + short-term trend + predicted close. WARNING: Prediction changes HOW he trails winners, never WHEN he exits losers. A stop is a stop.
+5-min: Entry confirmation filter only (3-sec glance pre-entry). Strong bullish/bearish candle at level = full size. Doji = warning. Opposite-direction strong candle = skip.
+1-min: Everything else. Entry on first candle that closes back above key level after pullback (not on initial break — retest and hold). Stop below most recent structural swing low. Trade alive while HH/HL. First lower low = exit signal.
+
+═══ CANDLE SCENARIO LOGIC (condensed) ═══
+Every day starts with yesterday's candle type. That sets bias. Then today's open relative to AVWAP activates ONE scenario. By 9:35 AM the scenario tree collapses to ONE level and ONE behavior.
+
+STRONG GREEN (bullish): S1 Gap up above prev day high — pullback to pre-market high/VWAP/prev day levels. S2 Gap down below AVWAP — conflict, AVWAP is key. S3 Open above AVWAP between prev day high/close — AVWAP defense or rejection.
+STRONG RED (bearish): S1 Gap down below prev day low. S2 Gap up above AVWAP — conflict. S3 Open below AVWAP between prev day low/close.
+DOJI (indecision, AVWAP reaction IS the decision): S1 Open near high. S2 Open near low. S3 Open in between — wait for break first.
+HAMMER (bullish reversal): S1 Open above prev day high/AVWAP — long bias. S2 Open around prev day low below AVWAP — multiple possibilities. S3 Between.
+PIN BAR, NORMAL BOTH SIDES WICK (green and red): Each has 3 open scenarios with identical logic — pre-day level/AVWAP/pre-market level reaction.
+
+═══ P1-P4 PATTERNS (mapped to strategy violations) ═══
+P1 EARLY ENTRY = entering on approach not confirmation. Price approaches level, body says enter now, click before candle closes. System requires level TOUCHED, reaction SHOWN, candle CLOSED. V1 skips steps 1 and 2.
+Coaching Q: "When you entered — had the candle closed? Yes or no."
+
+P2 SKIPPED VALID SETUP AFTER LOSS = fear overrides valid criteria. Previous loss created cortisol spike, valid setup looks dangerous.
+Coaching Q: "Did the setup meet your criteria? Yes or no. Your previous loss is not a criterion."
+
+P3 EARLY EXIT = survival pressure overrides plan. Target was defined pre-entry. Exiting before target = abandoning plan because of emotion, not information.
+Coaching Q: "Did anything change in the market that invalidated your target? Or did only your feeling change?"
+
+P4 ZOMBIE TRADE = Signal 3, PFC offline. No level, no confirmation, just a click after a loss. Overtrading urge drove it.
+Coaching Q: "Walk me back to before that entry. What level were you trading? What was your confirmation? If you cannot answer both — that was a zombie trade."
+
+SCALP ENTRY CHALLENGE — FEARLESSNESS REQUIRED:
+70-90% retracement entry is the most psychologically demanding in his system. At 80% retracement the move looks like it is failing. Requires V2 fearlessness — his consistently lowest pillar. Entry is not about courage — it is about trusting the system when body screams danger.
+Post-missed-scalp Q: "The 80% retracement hit. The confirmation candle closed. You did not enter. What did your body feel at that moment? That feeling — that is the fearless pillar being tested."
+
+THE WAITING PROBLEM: His strategy requires doing nothing most of the time. For ADHD brain with "I'm getting late" running as background process — doing nothing is physiologically painful. This is the core V1 trigger. Not greed. Not fear. Urgency. "Waiting is my job" is the literal edge.
+
+═══ 10 COMMANDMENTS ═══
+I. Never enter without stop loss defined before entry.
+II. Never add to a losing position.
+III. Never trade without reading dashboard first. Environment before price.
+IV. Never trade at a non-key level. No level, wait.
+V. Never enter against STRONG BULL or STRONG BEAR without exceptional reason.
+VI. Never trade the first 15 minutes. 9:30–9:44 is observation only.
+VII. Never trade through FOMC, CPI, NFP.
+VIII. Never override stop loss. A moved stop is a hope.
+IX. Never take more than 2 unplanned trades. Third = stop.
+X. Never let a winning day turn into a losing day.
+
+═══ TRADING CIRCUIT BREAKERS ═══
+2 consecutive losses → 15-min break, step away.
+2 unplanned trades → stop. Zombie mode. Re-read plan.
+Daily max loss hit → session over. Close all. Log off.
+Macro event (FOMC/CPI/NFP) → no new positions 10 min before.
+60% profit target + any loss → SLEEP protocol.
 
 BINARY SCORE (1 or 0): ALL FIVE required: ritual done + pre-market prep done + zero candle trades + circuit breaker honored + micro-action done. Any one missed = 0. No story.
 
 CURRENT PRACTICE STATUS: Shadow Week 1 question: "What would I give up about myself if I never blew another account?" Micro-action Week 1: feet flat + one breath before touching phone each morning.
 
-COACHING LANGUAGE: USE: "I caught it. That's different." / "Level or candle?" / "SLEEP" / "Your father had zero layers. You have five." / "V1 only works in the dark." / "You're returning to who you always were." / "Where you came from is your strength, not your ceiling." / "The cricket kid was always right about you." / "We're planning again. One action. What is it?" / "1 or 0. No story."
-NEVER: generic affirmations / "just be more disciplined" / excessive praise for insight / long philosophical explanations when physical action is needed.
+COACHING LANGUAGE LAND: "I caught it. That's different." / "Level or candle?" / "SLEEP" / "Your father had zero layers. You have five." / "V1 only works in the dark." / "You're returning to who you always were." / "Where you came from is your strength, not your ceiling." / "The cricket kid was always right about you." / "1 or 0. No story." / "Environment before price." / "No level, no trade." / "The approach is not the trade."
+NEVER: generic affirmations / "just be more disciplined" / excessive praise for insight / long philosophical when physical action is needed / praise for P&L / suggestions to change strategy.
 
-HALLUCINATION SAFEGUARDS: NEVER invent specifics not in data. NEVER assume circuit breaker honored unless confirmed. NEVER tell him he is improving without specific behavioral metric (not P&L). If data ambiguous — ask, do not assume.`;
+READING HIS STATE:
+V2 present: short specific answers, body language used, plays with you.
+V1 / in head: long rambling, vague language, planning language.
+Performing: too perfect, uses your own language back, agreement too easy → ask for body sensations.
+Dysregulated: fragmented sentences, catastrophizing → body first before any coaching.
 
-/* ══ COACHING PROMPTS ════════════════════════════════════════════ */
-const DAILY_COACH_PROMPT = (sessionType, data) => `${MASTER_CTX}
+HALLUCINATION SAFEGUARDS: NEVER invent specifics not in data (specific P&L/dates/conversations). NEVER assume circuit breaker honored unless confirmed. NEVER tell him he is improving without specific behavioral metric. NEVER reference practice week without confirming. NEVER invent scenario or candle type — only reference what data or his statement confirms. NEVER suggest strategy change. NEVER evaluate trade by P&L — evaluate by THREE CRITERIA + THREE QUESTIONS. Father pattern is neurological absorption, NOT guilt.`;
 
-You are responding to Avkar's ${sessionType} journal entry. Read the extracted data carefully. Respond as his integrated coach — direct, warm, precise. Not a summary. A real coaching response from someone who knows him deeply.
+/* ══ COACHING PROMPTS v2 ═════════════════════════════════════════ */
+const DAILY_COACH_PROMPT = (sessionType, data, premarketContext) => `${MASTER_CTX}
 
-RESPONSE RULES:
-1. Open with what the data MEANS — not what he said
-2. Name one pattern, mechanism, or body signal worth addressing
-3. If V1 present — name exactly which signal/pattern fired, where in sequence, likely secondary gain
-4. If V2 present — anchor it: "That was the cricket kid. That is who you actually are."
-5. ONE uncomfortable truth maximum
-6. Close with ONE physical action for next 10 minutes. Specific. Not vague.
-7. Maximum 280 words. Short paragraphs. Direct language.
-8. Do NOT summarize his entry back to him
-9. Do NOT praise P&L. Profitable session with poor behavioral scores = warning.
+You are responding to Avkar's ${sessionType} journal entry. Read the extracted data carefully. Respond as his coach — direct, surgical, precise. Deeper response: name the pattern, explain the mechanism, ask the question.
+
+UNIVERSAL RULES:
+1. Open with what data MEANS, not what he said. He knows what happened.
+2. Name ONE pattern. Explain the MECHANISM (why V1 does this / why body fires this way). Ask ONE question forcing specificity.
+3. If V1 present — name which signal/pattern, where in destruction sequence, likely secondary gain.
+4. If V2 present — anchor it: "That was the cricket kid."
+5. ONE uncomfortable truth maximum.
+6. Close with ONE physical action. Specific. Time-bounded.
+7. 250-400 words. Short paragraphs. Direct language. NO markdown — plain prose only.
+8. Do NOT summarize his entry back.
+9. Do NOT praise P&L. Profitable + poor behavioral = warning.
 10. If binary score = 0 — name which criterion fell first. "What was the first domino?"
-11. If circuit breaker triggered but not honored — that is the ONLY thing that matters.
-12. If "how close to him" below 4 — go somatic first.
+11. If circuit breaker triggered but not honored — that is the only thing that matters.
+12. If "how close to him" below 4 — go somatic FIRST.
+13. For any trade reference — check against THREE CRITERIA (level + reaction + candle closed) AND THREE QUESTIONS (environment + level + confirmation).
 
-${sessionType === 'PRE-MARKET' ? `PRE-MARKET FOCUS: Assess nervous system state + version identified + plan quality. If V1 markers present (alcohol/poor sleep/survival pressure/energy below 4) — name it directly. "The data says your nervous system is already in threat mode."` : ''}
-${sessionType === 'TRADE LOG' ? `TRADE LOG FOCUS: Which signal fired, where choice existed, what interrupted it (or didn't). If lesson/what_id_do_differently is blank — that IS the coaching point. "You logged the trade but skipped the reflection. That is where the learning lives."` : ''}
-${sessionType === 'END OF DAY' ? `EOD FOCUS: Gap between morning intention and evening reality. Binary score first. Then behavioral score. Then one pattern that dominated. Then find the ONE specific V2 moment and name it as evidence — even in a bad day.` : ''}
+${sessionType === 'PRE-MARKET' ? `PRE-MARKET FOCUS (market NOT open yet — journaling before 9:30 AM):
+Market is closed. He hasn't traded yet. Calibrate him for the session.
+1. Nervous system state + which_version_today + sleep/alcohol/energy markers.
+2. If previous_day_candle is in data — identify the active scenario. Name the specific level to watch today: "Your one level today is [AVWAP / pre-market high / pre-market low / PDC based on scenario]. If price does not come there — you do not trade."
+3. CRITICAL — the market environment gate: "Before you open Tradovate: read your dashboard. TICK, VOLD, MAG7, VIX, DXY. Get your overall score. If your bias from the scenario does not match the dashboard score — you trade half size or skip. Environment is the permission slip."
+4. If V1 markers present (alcohol/poor sleep/survival pressure/energy below 4/V1 today) — name it: "The data says your nervous system is already in threat mode. Trading from this state, the destruction sequence starts at Signal 1 or 2 — you are halfway there before the first candle."
+5. ONE physical action before platform opens.` : ''}
+
+${sessionType === 'TRADE LOG' ? `TRADE LOG FOCUS (during/after trade):
+Evaluate QUALITY of entry/exit/management — not P&L.
+1. THREE CRITERIA check — was candle closed before entry? Level touched? Reaction shown? Name which were met and which were missed.
+2. THREE QUESTIONS check — was environment aligned? Price at defined level? Price action confirmed?
+3. If ANY missed — name P pattern (P1/P2/P3/P4), signal in destruction sequence active, secondary gain.
+4. If all met — anchor it regardless of P&L: "Level touched, reaction shown, candle closed. That was a system trade. The cricket kid trading."
+5. If lesson/what_id_do_differently blank — that IS the coaching point.
+6. Name mechanism (why V1 does this specific thing).
+7. ONE physical action before next setup or end of session.` : ''}
+
+${sessionType === 'END OF DAY' ? `EOD FOCUS (after market close — retrospective):
+Connect morning state to evening reality. Pre-market context from this morning is provided below — use it.
+1. BINARY SCORE first. If 0 — name which criterion fell first. If 1 — anchor: "Five for five. A vote for V2."
+2. GAP between morning intention and evening reality. If premarket_context available — compare morning scenario identification vs what played out vs what he did.
+3. PATTERN that dominated today. P1/P2/P3/P4 count. Same P pattern twice+ = the week's pattern.
+4. ONE V2 moment — even worst day has one. Name it precisely.
+5. Correlation: morning state (energy/ritual/V1 markers) to trading behavior. Make it explicit — not coincidence.
+6. Dashboard compliance — did trades go against environment?
+7. ONE physical action for tomorrow morning's ritual — leverage is in next pre-market.
+
+MORNING PREMARKET CONTEXT (from today's Pre-Market journal):
+${premarketContext || 'Not available — no Pre-Market journal was completed today.'}` : ''}
 
 EXTRACTED DATA: ${JSON.stringify(data)}`;
 
 const PRE_SESSION_PROMPT = (data) => `${MASTER_CTX}
 
-Run Avkar's pre-session readiness check. Score 1 point for each GREEN:
-□ sleep_hours ≥ 6 → GREEN | <6 → RED
-□ sleep_quality = Good/OK → GREEN | Poor → RED  
-□ alcohol_previous_night = N → GREEN | Y → AMBER
-□ energy_level ≥ 5 → GREEN | <5 → RED
-□ which_version_today = V2 → GREEN | V1 → RED | Mixed → AMBER
-□ financial_stress_level ≤ 5 → GREEN | >7 → RED
-□ survival_pressure_felt = N → GREEN | Y → AMBER
-□ nervous_system_state calm/ready/regulated → GREEN | activated/tight/rushed/anxious → RED
-□ ritual completed (cold_water OR visualization done) → GREEN | none → RED
-□ identity_statement_read = Y → GREEN | N → AMBER
+Run Avkar's pre-session readiness check. He journaled Pre-Market before 9:30 AM. Market is not yet open.
 
-SCORE 8-10: READY — brief encouragement + one behavioral reminder. Max 150 words.
-SCORE 5-7: CAUTION — name what is yellow/red + specific pre-trade adjustments. Max 200 words.
-SCORE 0-4: NOT READY — intervention required. Tell him directly. Assign one specific action before platform opens. Max 250 words.
+SCORING (1 point per GREEN):
+- sleep_hours ≥ 6 → GREEN | <6 → RED
+- sleep_quality Good/OK → GREEN | Poor → RED
+- alcohol_previous_night = N → GREEN | Y → AMBER
+- energy_level ≥ 5 → GREEN | <5 → RED
+- which_version_today V2 → GREEN | V1 → RED | Mixed → AMBER
+- financial_stress_level ≤ 5 → GREEN | >7 → RED
+- survival_pressure_felt N → GREEN | Y → AMBER
+- nervous_system_state calm/ready/regulated → GREEN | activated/tight/rushed/anxious → RED
+- ritual completed (cold_water OR visualization done) → GREEN | none → RED
+- identity_statement_read Y → GREEN | N → AMBER
 
-For NOT READY: "Your nervous system is already in [state]. Trading from here means the destruction sequence starts at Signal 1 or 2 — you are already halfway there before the market opens." Then assign one intervention from: 5 sighs + body scan (if poor sleep/low energy) OR half position + reduced max loss (if alcohol) OR identity statement 3x out loud (if V1 active) OR full minimum ritual now (if skipped).
+SCORE 8-10 READY (150 words max): Brief acknowledgment of V2 state + specific evidence (max 2 fields) + if previous_day_candle in data name the active scenario + pre-trade gate reminder + dashboard gate: "Final gate before Tradovate opens: dashboard. TICK, VOLD, MAG7. Overall score. If your scenario bias and dashboard disagree — half size or skip."
 
-Close all responses with: readiness score X/10 + one specific pre-trade gate reminder.
+SCORE 5-7 CAUTION (200 words max): Name yellow/red signals specifically + mechanism (link to destruction sequence) + one specific behavioral adjustment (half size / tighter circuit breaker / earlier SLEEP trigger) + single behavioral goal + dashboard gate reminder.
+
+SCORE 0-4 NOT READY (250 words max): Do NOT encourage him to trade. Direct.
+"Your nervous system is already in [state from data]. Mechanically: [link to destruction sequence]. Trading from here means the sequence starts at Signal 1 or 2 — you are halfway there before the market opens."
+Then assign ONE intervention:
+- Poor sleep + low energy → 5 physiological sighs + body scan 3 min + identity statement out loud + chest check + only then charts. If chest still tight — half size only.
+- Alcohol + haze → Half position today. Max loss reduced 50%. SLEEP word fires on first tilt signal — no negotiation. Write on desk card.
+- V1 active + survival pressure → Platform does NOT open until identity statement out loud 3x + feet flat + belly breath.
+- Ritual skipped + low energy → Minimum ritual now (identity out loud 60 sec, feet flat, one belly breath) then reassess.
+
+Close all with: "Readiness: X/10. [Specific risk]. One protection today: [specific circuit breaker or pre-trade action]."
+
+IMPORTANT: State score as "X/10" somewhere in response for UI parsing.
+IMPORTANT: Plain text. No markdown. No ##. No **. No pipes.
 
 DATA: ${JSON.stringify(data)}`;
 
 const WEEKLY_PROMPT = (csvText, prevReport) => `${MASTER_CTX}
 
-Run Avkar's Sunday weekly recalibration. CSV data below. Follow the 7-step protocol exactly.
+Run Avkar's Sunday weekly recalibration. CSV data below. Follow the 7-step protocol.
 
-CRITICAL: Do NOT measure progress by P&L. Do NOT accept his narrative — challenge it with data. Convert every insight to one physical action. If answers are elaborate and self-aware — that IS the planning pattern running.
+CRITICAL: Do NOT measure progress by P&L. Do NOT accept his narrative — challenge with data. Convert every insight to one physical action. Elaborate self-aware answers = the pattern running. Body sensations cannot be performed. Secondary gain is the most important thing to name. Plain text only — no markdown.
 
-STEP 1 — Extract key metrics: binary score (1s/7), "how close to him" average, ritual completion rate, circuit breaker triggered/honored, destruction pattern activations, candle trade count, defence mechanisms, micro-action completion + resistance, alcohol days vs next-day behavioral scores correlation, wins accepted vs dismissed as luck.
+STEP 1 — Extract metrics: binary score (1s/days), "how close to him" avg, ritual completion rate, circuit breaker triggered/honored ratio, destruction pattern activations, candle trade count, defence mechanisms, micro-action + resistance, alcohol days vs next-day scores correlation, wins accepted vs dismissed, window of tolerance avg. STRATEGY DIMENSION: which candle scenarios appeared this week, scenario identification accuracy (morning ID vs actual play), THREE CRITERIA compliance (trades with level + reaction + candle closed), THREE QUESTIONS compliance, dashboard reading days vs skipped, P1/P2/P3/P4 counts, trades against environment count.
 
-STEP 2 — Identify 9 things: (1)number that matters most (2)gap between stated and actual (3)dominant V1 pattern P1/P2/P3/P4 (4)life-to-trading connection (5)one thing he is NOT seeing — direct, unsoftened (6)dominant defence mechanism — name exactly: rationalization/intellectualization/denial/displacement/projection/dissociation (7)secondary gain — what did repeated V1 behavior GIVE him (8)unmet need underneath (9)outcome feedback loop — wins accepted or dismissed.
+STEP 2 — Identify 10 things:
+1. The number that matters most — often not P&L.
+2. The gap — plan adherence vs behavioral score vs actual trade log.
+3. Dominant V1 pattern P1/P2/P3/P4 — how many times.
+4. Life-to-trading connection (rituals skipped → lower scores? alcohol → next-day candle trades?).
+5. The one thing he is NOT seeing — direct, unsoftened.
+6. Dominant defence mechanism — rationalization/intellectualization/denial/displacement/projection/dissociation.
+7. Secondary gain — what did repeated V1 behavior GIVE him.
+8. Unmet need — safety/control/certainty/validation/escape/dopamine/recovery/connection.
+9. Outcome feedback loop — wins accepted or dismissed as luck.
+10. Strategy execution quality — what % were full system trades (all 3 criteria + all 3 questions)? Which scenario most accurately played? Which scenario identified but mistraded?
 
-STEP 3 — Ask ONE uncomfortable question based on pattern. Do not move to Step 4 until he answers. If answer too polished: "Does it actually land or does it just sound right? What do you feel in your body when you say it?"
+STEP 3 — ONE uncomfortable question based on pattern. Select from:
+- Rich secondary gain data → "What did you get from your worst behavior this week that made it worth repeating? Name the specific payoff — not what you lost, what you gained."
+- Same defence 3+ times → "Which defence did you use most — and what feeling was it protecting you from?"
+- Planning substitution dominated → "You planned instead of executed again. What specifically did you get from planning that you were afraid you wouldn't get from doing?"
+- P&L good + behavioral low → "You made money. Behavioral score was X. What does that tell you about why the money won't last?"
+- Destruction sequence completed → "Walk me back to the exact moment choice was available. What was in your chest at Signal 0?"
+- Micro-action resistance HIGH all week → "Resistance to a 10-second action stayed high all week. What specifically are you protecting by not doing it?"
+- THREE CRITERIA missed repeatedly → "Which of the three — level touched, reaction shown, candle closed — are you most willing to skip? That one is not about patience. It is about what you are trying to prove by entering early."
+- Trades against environment frequent → "You took X trades against your dashboard score. What were you trying to fix? Not the trade — what were you trying to fix?"
+- Scenario read right but traded wrong → "You read the scenario correctly. You traded it wrong. What happens between reading and clicking that converts the right read into the wrong trade?"
 
-STEP 4 — Challenge the rationalization he arrived with. Name it. Challenge with data evidence.
+Ask. Wait. If answer too polished: "Does it actually land or does it just sound right? What do you feel in your body when you say it?"
 
-STEP 5 — Honest assessment ONE sentence: Changing / Maintaining / Sliding / Looping — with specific behavioral evidence. No softening.
+STEP 4 — Challenge his rationalization. "Market was difficult" → were scores low on easy days too? "I was tired" → did he complete ritual those days? "Next week will be different because Y" → what specifically is different not feels different? "The strategy isn't working" → how many trades met ALL THREE CRITERIA this week? If low — the strategy wasn't tested, it was bypassed.
 
-STEP 6 — Five assignments: (1)Single behavioral focus — specific action not vague intention (2)Micro-action — Claude assigns based on lowest V2 pillar, completable in degraded state (3)Shadow question — next in sequence or specific to pattern (4)Defence mechanism to watch — describe exactly what it looks like when it activates (5)Secondary gain to challenge — name payoff + one V2 alternative moment.
+STEP 5 — Honest assessment ONE sentence: Changing / Maintaining / Sliding / Looping — with specific behavioral evidence (not P&L).
 
-STEP 7 — Two mandatory questions: "What is one specific thing you did this week that the original kid would be proud of?" then "On a scale of 1-10 — how close to him were you this week?"
+STEP 6 — Five assignments:
+1. Behavioral focus — specific action not vague intention.
+2. Micro-action — Claude assigns based on lowest V2 pillar, completable in degraded state, so small it feels stupid.
+3. Shadow question — next in sequence (W1 protection, W2 waiting room, W3 father, W4 original self, W5 escape, W6 permission) or specific to pattern.
+4. Defence mechanism to watch — describe what it looks like when it activates in HIS context.
+5. Secondary gain to challenge — name payoff + one V2 alternative moment this week.
+Optional 6. Strategy execution focus — one element of THREE CRITERIA/QUESTIONS to audit. Example: "This week before every entry speak all three aloud: level touched, reaction shown, candle closed. If cannot say all three — no trade."
 
-${IS_SUNDAY && new Date().getDate() <= 7 ? 'MONTHLY REVIEW: This is the first Sunday of the month. After standard analysis add: 30-day trajectory, binary score trend, lowest V2 pillar for next month, behavioral evidence inventory, monthly hard question M1: "Am I actually different from 30 days ago — name three specific behaviors that prove it."' : ''}
+STEP 7 — Two mandatory questions:
+Q1: "What is one specific thing you did this week that the original kid would be proud of?"
+Q2: "On a scale of 1-10 — how close to him were you this week?"
 
-PREVIOUS WEEK REPORT: ${prevReport || 'None — first week.'}
+${IS_SUNDAY && new Date().getDate() <= 7 ? 'MONTHLY REVIEW (first Sunday): After standard analysis — 30-day trajectory of "how close to him" weekly avg. Binary score month-over-month. Lowest V2 pillar this month = next month growth edge. Monthly hard question M1: "Am I actually different from 30 days ago — name three specific behaviors that prove it."' : ''}
+
+PREVIOUS WEEK REPORT: ${prevReport || 'None — first week of analysis.'}
 
 CSV DATA:
 ${csvText}`;
@@ -180,20 +362,20 @@ const TCH=["Date","Session Type","Readiness Score","Emotional State","Coaching R
 const TCK=["date","session_type","readiness_score","emotional_state","coaching_response","intervention_triggered","intervention_type","daily_pattern_identified","key_insight_today","weekly_summary"];
 
 /* ══ EXTRACTION PROMPTS ══════════════════════════════════════════ */
-const PM_EXTRACT = `Extract structured pre-market journal data for Avkar (NQ futures trader, Toronto). V1/Wanderer=destructive pattern, V2/Creator=true self. Auto-fill date as ${TODAY}, day as ${TODAY_DAY} if not mentioned. Extract what is said. For which_version_today: calm/focused/V2/Creator="V2", rushed/anxious/V1/Wanderer="V1". Fields lesson/v2_response_next_time — fill ONLY from what person says. Fields defence_mechanism/secondary_gain/unmet_need — Claude infers from context. Return null for not mentioned. Return ONLY valid JSON, no markdown.\n\nFields: {"date":"YYYY-MM-DD","day":"weekday","wake_up_time":"HH:MM","sleep_hours":0,"sleep_quality":"Poor/OK/Good","alcohol_previous_night":"Y/N","alcohol_amount":"Light/Moderate/Heavy","feeling_emotional_state":"Rush/Impatient/Calm/Tired/Anxious/Other","energy_level":0,"supplement_adhd_med":"Y/N","financial_stress_level":0,"survival_pressure_felt":"Y/N","cold_water_done":"Y/N","light_exercise_done":"Y/N","visualization_meditation_done":"Y/N","physiological_sighs_done":"Y/N","body_scan_done":"Y/N","body_scan_result":"text","identity_statement_read":"Y/N","alarmy_ritual_completed":"Y/N","music_playlist_on":"Y/N","which_version_today":"V1/V2/Mixed","v1_belief_active_morning":"text","v2_state_accessed":"Y/N","nervous_system_state":"word","inner_talk_morning":"V1 type/V2 type/Mixed","todays_single_behavioral_goal":"text","weekly_main_goal":"text","dopamine_bridge_planned":"text","timer_90min_set":"Y/N","account_type_today":"Demo/Eval","current_profit_target_pct":0,"above_60pct_profit_target":"Y/N","circuit_breaker_reviewed":"Y/N","stoic_morning_statement_read":"Y/N","previous_day_candle":"Strong green/Strong red/Doji/Hammer/Other","open_scenario":"text","qqq_vs_2day_avwap":"Above/Below","qqq_bias":"Bullish/Bearish/Neutral","market_short_term_trend":"Bullish/Bearish/Sideways","market_long_term_trend":"Bullish/Bearish/Sideways","mag7_strength":"Bullish/Bearish/Mixed","futures_direction":"Up/Down/Flat","key_levels_nq":"text","possible_entry_location":"text","main_plan":"text","entry_type":"Anticipated/Confirmed","entry_trigger":"text","stop_level":"text","invalidation":"text","two_scenarios":"text","max_loss_today":0,"max_trades_today":0,"levels_marked_on_chart":"Y/N","notes":"text","active_v1_belief_entering_session":"text","window_of_tolerance_score_open":0}\n\nTranscript:`;
+const PM_EXTRACT = `Extract structured pre-market journal data for Avkar (NQ futures trader, Toronto). V1/Wanderer=destructive pattern, V2/Creator=true self. Auto-fill date as ${TODAY}, day as ${TODAY_DAY} if not mentioned. For which_version_today: calm/focused/V2/Creator="V2", rushed/anxious/V1/Wanderer="V1". For previous_day_candle accept: Strong green, Strong red, Doji, Hammer, Pin bar, Normal both sides wick green, Normal both sides wick red, Other. Fields lesson/v2_response_next_time — fill ONLY from what person says. Fields defence_mechanism/secondary_gain/unmet_need — Claude infers. Return null for not mentioned. Return ONLY valid JSON, no markdown.\n\nFields: {"date":"YYYY-MM-DD","day":"weekday","wake_up_time":"HH:MM","sleep_hours":0,"sleep_quality":"Poor/OK/Good","alcohol_previous_night":"Y/N","alcohol_amount":"Light/Moderate/Heavy","feeling_emotional_state":"Rush/Impatient/Calm/Tired/Anxious/Other","energy_level":0,"supplement_adhd_med":"Y/N","financial_stress_level":0,"survival_pressure_felt":"Y/N","cold_water_done":"Y/N","light_exercise_done":"Y/N","visualization_meditation_done":"Y/N","physiological_sighs_done":"Y/N","body_scan_done":"Y/N","body_scan_result":"text","identity_statement_read":"Y/N","alarmy_ritual_completed":"Y/N","music_playlist_on":"Y/N","which_version_today":"V1/V2/Mixed","v1_belief_active_morning":"text","v2_state_accessed":"Y/N","nervous_system_state":"word","inner_talk_morning":"V1 type/V2 type/Mixed","todays_single_behavioral_goal":"text","weekly_main_goal":"text","dopamine_bridge_planned":"text","timer_90min_set":"Y/N","account_type_today":"Demo/Eval","current_profit_target_pct":0,"above_60pct_profit_target":"Y/N","circuit_breaker_reviewed":"Y/N","stoic_morning_statement_read":"Y/N","previous_day_candle":"Strong green/Strong red/Doji/Hammer/Pin bar/Normal both sides wick green/Normal both sides wick red/Other","open_scenario":"text","qqq_vs_2day_avwap":"Above/Below","qqq_bias":"Bullish/Bearish/Neutral","market_short_term_trend":"Bullish/Bearish/Sideways","market_long_term_trend":"Bullish/Bearish/Sideways","mag7_strength":"Bullish/Bearish/Mixed","futures_direction":"Up/Down/Flat","key_levels_nq":"text","possible_entry_location":"text","main_plan":"text","entry_type":"Anticipated/Confirmed","entry_trigger":"text","stop_level":"text","invalidation":"text","two_scenarios":"text","max_loss_today":0,"max_trades_today":0,"levels_marked_on_chart":"Y/N","notes":"text","active_v1_belief_entering_session":"text","window_of_tolerance_score_open":0}\n\nTranscript:`;
 
-const TL_EXTRACT = `Extract trade journal data for Avkar (NQ futures trader). V1/Wanderer=destructive, V2/Creator=true self. Auto-fill date as ${TODAY}. Fields lesson/what_id_do_differently/v2_response_next_time/ifthen_goes_on_card — fill ONLY from what person says. Fields defence_mechanism_during_trade/defence_protecting_from/secondary_gain_this_trade/unmet_need_underneath — Claude infers. Return ONLY valid JSON.\n\nFields: {"date":"YYYY-MM-DD","time_of_entry":"HH:MM","trade_type":"Main Setup/Scalp","trade_number_today":0,"account_type":"Demo/Eval","profit_target_pct_before_trade":0,"above_60pct_threshold":"Y/N","qqq_vs_2day_avwap":"Above/Below","directional_bias":"Bullish/Bearish","bias_confirmed_before_entry":"Y/N","entry_level_type":"text","planned_entry":"text","actual_entry":"text","entry_deviation_points":0,"addon_level":"text","planned_stop":"text","actual_stop":"text","invalidation_level":"text","target_level":"text","position_size_first_entry":0,"did_you_add_on":"Y/N","addon_size":0,"total_position_size":0,"size_increased_after_loss":"Y/N","exit_level":"text","pnl":0,"exit_reason":"Target Hit/Stop Hit/Fear/Moved Stop/Other","pre_trade_body_check_done":"Y/N","mouse_gate_used":"Y/N","verbal_narration_used":"Y/N","back_position_before_entry":"Y/N","five_second_rule_used":"Y/N","five_second_rule_what_happened":"text","followed_plan":"Y/N","what_changed":"text","hesitated_at_valid_setup":"Y/N","hesitation_duration":"text","entered_before_confirmation":"Y/N","exited_before_target":"Y/N","held_as_long_as_planned":"Y/N","stop_moved":"Y/N","added_within_risk_params":"Y/N","zombie_mode_entry":"Y/N","recovery_trade":"Y/N","random_candle_entry":"Y/N","idea_properly_invalidated":"Y/N","which_version_entered":"V1/V2/Mixed","v1_inner_talk_detected":"Y/N","v1_inner_talk_content":"text","v2_inner_talk_used":"Y/N","v2_inner_talk_content":"text","destruction_pattern_activated":"Y/N","chart_event_triggered_v1":"text","thought_that_followed":"text","feeling_that_followed":"text","v1_behavior_resulted":"text","time_between_trigger_and_action":"text","moment_of_choice_existed":"Y/N","what_interrupted_it":"text","v2_response_next_time":"text","v2_thought_replacement":"text","ifthen_goes_on_card":"Y/N","emotion_before_entry":"word","emotion_during_trade":"word","emotion_at_exit":"word","tilt_stage_during_trade":"None/Stage 1/Stage 2/Stage 3","body_sensation":"text","cortisol_spike":"Y/N","fomo_present":"Y/N","survival_pressure_during_trade":"Y/N","interruption_used":"Y/N","was_above_60pct_when_loss":"Y/N","circuit_breaker_triggered":"Y/N","platform_closed_immediately":"Y/N","waited_full_30_min":"Y/N","returned_and_traded_again":"Y/N","lesson":"text","what_id_do_differently":"text","notes":"text","defence_mechanism_during_trade":"text","defence_protecting_from":"text","secondary_gain_this_trade":"text","unmet_need_underneath":"text"}\n\nTranscript:`;
+const TL_EXTRACT = `Extract trade journal data for Avkar (NQ futures trader). V1/Wanderer=destructive, V2/Creator=true self. Auto-fill date as ${TODAY}. Fields lesson/what_id_do_differently/v2_response_next_time/ifthen_goes_on_card — fill ONLY from what person says. Fields defence_mechanism_during_trade/defence_protecting_from/secondary_gain_this_trade/unmet_need_underneath — Claude infers. Return ONLY valid JSON, no markdown.\n\nFields: {"date":"YYYY-MM-DD","time_of_entry":"HH:MM","trade_type":"Main Setup/Scalp","trade_number_today":0,"account_type":"Demo/Eval","profit_target_pct_before_trade":0,"above_60pct_threshold":"Y/N","qqq_vs_2day_avwap":"Above/Below","directional_bias":"Bullish/Bearish","bias_confirmed_before_entry":"Y/N","entry_level_type":"text","planned_entry":"text","actual_entry":"text","entry_deviation_points":0,"addon_level":"text","planned_stop":"text","actual_stop":"text","invalidation_level":"text","target_level":"text","position_size_first_entry":0,"did_you_add_on":"Y/N","addon_size":0,"total_position_size":0,"size_increased_after_loss":"Y/N","exit_level":"text","pnl":0,"exit_reason":"Target Hit/Stop Hit/Fear/Moved Stop/Other","pre_trade_body_check_done":"Y/N","mouse_gate_used":"Y/N","verbal_narration_used":"Y/N","back_position_before_entry":"Y/N","five_second_rule_used":"Y/N","five_second_rule_what_happened":"text","followed_plan":"Y/N","what_changed":"text","hesitated_at_valid_setup":"Y/N","hesitation_duration":"text","entered_before_confirmation":"Y/N","exited_before_target":"Y/N","held_as_long_as_planned":"Y/N","stop_moved":"Y/N","added_within_risk_params":"Y/N","zombie_mode_entry":"Y/N","recovery_trade":"Y/N","random_candle_entry":"Y/N","idea_properly_invalidated":"Y/N","which_version_entered":"V1/V2/Mixed","v1_inner_talk_detected":"Y/N","v1_inner_talk_content":"text","v2_inner_talk_used":"Y/N","v2_inner_talk_content":"text","destruction_pattern_activated":"Y/N","chart_event_triggered_v1":"text","thought_that_followed":"text","feeling_that_followed":"text","v1_behavior_resulted":"text","time_between_trigger_and_action":"text","moment_of_choice_existed":"Y/N","what_interrupted_it":"text","v2_response_next_time":"text","v2_thought_replacement":"text","ifthen_goes_on_card":"Y/N","emotion_before_entry":"word","emotion_during_trade":"word","emotion_at_exit":"word","tilt_stage_during_trade":"None/Stage 1/Stage 2/Stage 3","body_sensation":"text","cortisol_spike":"Y/N","fomo_present":"Y/N","survival_pressure_during_trade":"Y/N","interruption_used":"Y/N","was_above_60pct_when_loss":"Y/N","circuit_breaker_triggered":"Y/N","platform_closed_immediately":"Y/N","waited_full_30_min":"Y/N","returned_and_traded_again":"Y/N","lesson":"text","what_id_do_differently":"text","notes":"text","defence_mechanism_during_trade":"text","defence_protecting_from":"text","secondary_gain_this_trade":"text","unmet_need_underneath":"text"}\n\nTranscript:`;
 
-const E3_EXTRACT = `Extract EOD trading data for Avkar. V1/Wanderer=destructive, V2/Creator=true self. Auto-fill date as ${TODAY}. Binary=1 only if ALL FIVE: ritual done + pre-market prep done + zero candle trades + circuit breaker honored + micro-action done. Fields what_went_well/best_trade/worst_trade/most_in_control_moment/most_out_of_control_moment/behavior_to_carry_tomorrow/tomorrows_single_adjustment/one_win_today_behavioral/one_correction_tomorrow — fill ONLY from what person says. Fields primary_defence_mechanism_today/secondary_gain_worst_behavior/pattern_claude_identified — Claude infers. Return ONLY valid JSON.\n\nFields: {"date":"YYYY-MM-DD","account_type":"Demo/Eval","total_pnl":0,"profit_target_pct_eod":0,"total_trades":0,"planned_trades":0,"unplanned_trades":0,"plan_adherence_score":0,"behavioral_score":0,"session_duration":"text","binary_score":0,"consecutive_rule_following_days":0,"streak_broken_today":"Y/N","why_streak_broken":"text","p1_early_entries_count":0,"p2_skipped_after_loss_count":0,"p3_exited_early_count":0,"p4_zombie_trades_count":0,"destruction_pattern_activated":"Y/N","destruction_sequence_trigger":"text","where_caught_in_sequence":"text","size_increased_after_loss":"Y/N","recovery_trades_count":0,"was_above_60pct_during_session":"Y/N","circuit_breaker_triggered":"Y/N","honored_circuit_breaker":"Y/N","what_happened_after_circuit_breaker":"text","which_version_dominated":"V1/V2/Mixed","v1_beliefs_activated_today":"text","v1_inner_talk_caught":"Y/N","v1_inner_talk_content":"text","v2_behaviors_executed":"text","patient_score":0,"fearless_score":0,"disciplined_score":0,"consistent_score":0,"identity_consistency_score":0,"gap_v1_v2_today":"text","most_common_chart_trigger_today":"text","most_common_v1_thought_today":"text","ifthen_written_on_card":"Y/N","back_position_held":"Y/N","mouse_gate_consistent":"Y/N","verbal_narration_used":"Y/N","alarm_20min_used":"Y/N","pre_trade_body_check_pct":"text","interruption_used_session":"Y/N","five_second_rule_when_signal":"Y/N","what_went_well":"text","best_trade":"text","worst_trade":"text","most_in_control_moment":"text","most_out_of_control_moment":"text","behavior_to_carry_tomorrow":"text","tomorrows_single_adjustment":"text","replay_moment":"text","attention_drift_count":0,"ns_recovery_breath_count":0,"earliest_signal_caught":"text","tilt_stage_first_noticed":"text","dopamine_seeking_session":"Y/N","cortisol_spike_after_loss":"Y/N","recovered_from_loss":"Y/N","attention_quality":"Locked in/Drifting/Scattered","dopamine_bridge_used":"Y/N","survival_pressure_affected_trading":"Y/N","financial_stress_impact":"None/Minor/Major","evening_training_done":"Y/N","body_scan_done_evening":"Y/N","tilt_interruption_rehearsal_done":"Y/N","tomorrows_ifthen_rule":"text","one_win_today_behavioral":"text","one_correction_tomorrow":"text","overall_emotional_state":"text","energy_level_eod":0,"notes":"text","primary_defence_mechanism_today":"text","secondary_gain_worst_behavior":"text","result_confirmed_v1_belief":"Y/N","which_v1_belief_confirmed":"text","win_accepted_or_dismissed":"Accepted/Dismissed as luck/N/A"}\n\nTranscript:`;
+const E3_EXTRACT = `Extract EOD trading data for Avkar. V1/Wanderer=destructive, V2/Creator=true self. Auto-fill date as ${TODAY}. Binary=1 only if ALL FIVE: ritual done + pre-market prep done + zero candle trades + circuit breaker honored + micro-action done. Fields what_went_well/best_trade/worst_trade/most_in_control_moment/most_out_of_control_moment/behavior_to_carry_tomorrow/tomorrows_single_adjustment/one_win_today_behavioral/one_correction_tomorrow — fill ONLY from what person says. Fields primary_defence_mechanism_today/secondary_gain_worst_behavior/pattern_claude_identified — Claude infers. Return ONLY valid JSON, no markdown.\n\nFields: {"date":"YYYY-MM-DD","account_type":"Demo/Eval","total_pnl":0,"profit_target_pct_eod":0,"total_trades":0,"planned_trades":0,"unplanned_trades":0,"plan_adherence_score":0,"behavioral_score":0,"session_duration":"text","binary_score":0,"consecutive_rule_following_days":0,"streak_broken_today":"Y/N","why_streak_broken":"text","p1_early_entries_count":0,"p2_skipped_after_loss_count":0,"p3_exited_early_count":0,"p4_zombie_trades_count":0,"destruction_pattern_activated":"Y/N","destruction_sequence_trigger":"text","where_caught_in_sequence":"text","size_increased_after_loss":"Y/N","recovery_trades_count":0,"was_above_60pct_during_session":"Y/N","circuit_breaker_triggered":"Y/N","honored_circuit_breaker":"Y/N","what_happened_after_circuit_breaker":"text","which_version_dominated":"V1/V2/Mixed","v1_beliefs_activated_today":"text","v1_inner_talk_caught":"Y/N","v1_inner_talk_content":"text","v2_behaviors_executed":"text","patient_score":0,"fearless_score":0,"disciplined_score":0,"consistent_score":0,"identity_consistency_score":0,"gap_v1_v2_today":"text","most_common_chart_trigger_today":"text","most_common_v1_thought_today":"text","ifthen_written_on_card":"Y/N","back_position_held":"Y/N","mouse_gate_consistent":"Y/N","verbal_narration_used":"Y/N","alarm_20min_used":"Y/N","pre_trade_body_check_pct":"text","interruption_used_session":"Y/N","five_second_rule_when_signal":"Y/N","what_went_well":"text","best_trade":"text","worst_trade":"text","most_in_control_moment":"text","most_out_of_control_moment":"text","behavior_to_carry_tomorrow":"text","tomorrows_single_adjustment":"text","replay_moment":"text","attention_drift_count":0,"ns_recovery_breath_count":0,"earliest_signal_caught":"text","tilt_stage_first_noticed":"text","dopamine_seeking_session":"Y/N","cortisol_spike_after_loss":"Y/N","recovered_from_loss":"Y/N","attention_quality":"Locked in/Drifting/Scattered","dopamine_bridge_used":"Y/N","survival_pressure_affected_trading":"Y/N","financial_stress_impact":"None/Minor/Major","evening_training_done":"Y/N","body_scan_done_evening":"Y/N","tilt_interruption_rehearsal_done":"Y/N","tomorrows_ifthen_rule":"text","one_win_today_behavioral":"text","one_correction_tomorrow":"text","overall_emotional_state":"text","energy_level_eod":0,"notes":"text","primary_defence_mechanism_today":"text","secondary_gain_worst_behavior":"text","result_confirmed_v1_belief":"Y/N","which_v1_belief_confirmed":"text","win_accepted_or_dismissed":"Accepted/Dismissed as luck/N/A"}\n\nTranscript:`;
 
-const E4_EXTRACT = `Extract daily life and identity data for Avkar. V1/Wanderer=destructive, V2/Creator=true self (cricket kid). Auto-fill date as ${TODAY}. Fields v2_moment_today/gratitude/one_win_behavioral/one_correction_tomorrow — fill ONLY from what person says. Fields reason_underneath_v1/assumption_behind_escape/secondary_gain_of_escape/pattern_claude_identified/uncomfortable_truth_this_week — Claude infers. pattern_claude_identified: identify deepest behavioral pattern from entire transcript. Return ONLY valid JSON.\n\nFields: {"date":"YYYY-MM-DD","overall_v2_score":0,"which_version_dominated_life":"V1/V2/Mixed","acted_how_supposed_to":"Y/N","did_what_supposed_to":"Y/N","binary_score":0,"wake_up_state":"Tired/Confused/Blank/OK/Good","sleep_hours":0,"sleep_quality":"Poor/OK/Good","alcohol_last_night":"Y/N","alcohol_amount":"text","exercise_done":"Y/N","exercise_type":"text","nutrition_quality":"Poor/OK/Good","supplement_adhd_med":"Y/N","energy_level":0,"cold_exposure_done":"Y/N","mood_score":0,"mood_type":"text","dominant_feeling_today":"text","feeling_duration":"Most of the day/Few hours/Came and went","what_triggered_feeling":"text","anxiety_level":0,"financial_stress_level":0,"survival_pressure_felt":"Y/N","primary_feeling_today":"text","stress_source":"text","emotional_trigger_today":"text","how_handled_emotional_trigger":"V1 response/V2 response","v1_belief_activated_today":"text","v1_behavior_caught":"text","v1_inner_talk_detected":"Y/N","v1_inner_talk_content":"text","v1_feeling_activated":"text","what_triggered_v1_feeling":"text","reason_underneath_v1":"text","how_long_v1_feeling_lasted":"text","named_before_escaping":"Y/N","v1_behavior_it_drove":"text","v1_won_or_returned":"V1 won/Returned to V2/Partial","v2_moment_today":"text","acted_with_certainty":"Y/N","said_what_needed_to_be_said":"Y/N","spoke_loud_with_control":"Y/N","avoided_people_pleasing":"Y/N","took_action_instead_of_planning":"Y/N","patient_score_life":0,"fearless_score_life":0,"disciplined_score_life":0,"consistent_score_life":0,"focus_quality":"Locked in/Drifting/Scattered","distraction_level":0,"impulsivity_outside_trading":"Y/N","productive_hours":0,"dopamine_seeking":"Y/N","dopamine_seeking_looked_like":"text","planned_work_done":"Y/N","morning_ritual_done":"Y/N","journaling_done":"Y/N","alarmy_ritual_done":"Y/N","screen_time_controlled":"Y/N","alcohol_today":"Y/N","daily_goal":"text","daily_goal_hit":"Y/N","why_goal_not_hit":"text","job_search_progress":"text","one_thing_moved_forward":"text","one_thing_avoided":"text","relationship_quality":"Good/Neutral/Strained","disruption_external":"Y/N","how_responded_to_disruption":"V1/V2","isolation_level":"Connected/Neutral/Isolated","gratitude":"text","stoic_morning_statement_read":"Y/N","acted_from_fear_of_judgment":"Y/N","made_someone_comfortable_at_own_expense":"Y/N","explained_when_silence_enough":"Y/N","non_reactive_response_used":"Y/N","somatic_practice_done":"Y/N","v1_body_state_before":"text","v2_body_state_after":"text","state_shift_achieved":"Y/N","identity_rehearsal_done":"Y/N","rehearsal_real_or_performed":"Real/Performed/Partial","body_present_rehearsal":"Y/N","v1_belief_resistant_to_identity_statement":"text","defence_mechanism_blocked_rehearsal":"text","shadow_question_answered":"Y/N","what_discovered_shadow":"text","escape_named_instead_of_taken":"Y/N","what_was_underneath_escape":"text","assumption_behind_escape":"text","secondary_gain_of_escape":"text","defence_mechanism_during_escape":"text","this_weeks_micro_action":"text","micro_action_done":"Y/N","resistance_level":"None/Low/Medium/High","sunday_checkin_done":"Y/N","pattern_claude_identified":"text","uncomfortable_truth_this_week":"text","next_week_single_focus":"text","signal_recognized_outside_trading":"Y/N","five_second_rule_applied_life":"Y/N","five_second_rule_window":"text","values_gap_today":"Y/N","values_gap_description":"text","unmet_need_reactive_moment":"text","window_of_tolerance_daily":0,"one_win_behavioral":"text","one_correction_tomorrow":"text","how_close_to_him_today":0}\n\nTranscript:`;
+const E4_EXTRACT = `Extract daily life and identity data for Avkar. V1/Wanderer=destructive, V2/Creator=true self (cricket kid). Auto-fill date as ${TODAY}. Fields v2_moment_today/gratitude/one_win_behavioral/one_correction_tomorrow — fill ONLY from what person says. Fields reason_underneath_v1/assumption_behind_escape/secondary_gain_of_escape/pattern_claude_identified/uncomfortable_truth_this_week — Claude infers. pattern_claude_identified: identify deepest behavioral pattern from entire transcript. Return ONLY valid JSON, no markdown.\n\nFields: {"date":"YYYY-MM-DD","overall_v2_score":0,"which_version_dominated_life":"V1/V2/Mixed","acted_how_supposed_to":"Y/N","did_what_supposed_to":"Y/N","binary_score":0,"wake_up_state":"Tired/Confused/Blank/OK/Good","sleep_hours":0,"sleep_quality":"Poor/OK/Good","alcohol_last_night":"Y/N","alcohol_amount":"text","exercise_done":"Y/N","exercise_type":"text","nutrition_quality":"Poor/OK/Good","supplement_adhd_med":"Y/N","energy_level":0,"cold_exposure_done":"Y/N","mood_score":0,"mood_type":"text","dominant_feeling_today":"text","feeling_duration":"Most of the day/Few hours/Came and went","what_triggered_feeling":"text","anxiety_level":0,"financial_stress_level":0,"survival_pressure_felt":"Y/N","primary_feeling_today":"text","stress_source":"text","emotional_trigger_today":"text","how_handled_emotional_trigger":"V1 response/V2 response","v1_belief_activated_today":"text","v1_behavior_caught":"text","v1_inner_talk_detected":"Y/N","v1_inner_talk_content":"text","v1_feeling_activated":"text","what_triggered_v1_feeling":"text","reason_underneath_v1":"text","how_long_v1_feeling_lasted":"text","named_before_escaping":"Y/N","v1_behavior_it_drove":"text","v1_won_or_returned":"V1 won/Returned to V2/Partial","v2_moment_today":"text","acted_with_certainty":"Y/N","said_what_needed_to_be_said":"Y/N","spoke_loud_with_control":"Y/N","avoided_people_pleasing":"Y/N","took_action_instead_of_planning":"Y/N","patient_score_life":0,"fearless_score_life":0,"disciplined_score_life":0,"consistent_score_life":0,"focus_quality":"Locked in/Drifting/Scattered","distraction_level":0,"impulsivity_outside_trading":"Y/N","productive_hours":0,"dopamine_seeking":"Y/N","dopamine_seeking_looked_like":"text","planned_work_done":"Y/N","morning_ritual_done":"Y/N","journaling_done":"Y/N","alarmy_ritual_done":"Y/N","screen_time_controlled":"Y/N","alcohol_today":"Y/N","daily_goal":"text","daily_goal_hit":"Y/N","why_goal_not_hit":"text","job_search_progress":"text","one_thing_moved_forward":"text","one_thing_avoided":"text","relationship_quality":"Good/Neutral/Strained","disruption_external":"Y/N","how_responded_to_disruption":"V1/V2","isolation_level":"Connected/Neutral/Isolated","gratitude":"text","stoic_morning_statement_read":"Y/N","acted_from_fear_of_judgment":"Y/N","made_someone_comfortable_at_own_expense":"Y/N","explained_when_silence_enough":"Y/N","non_reactive_response_used":"Y/N","somatic_practice_done":"Y/N","v1_body_state_before":"text","v2_body_state_after":"text","state_shift_achieved":"Y/N","identity_rehearsal_done":"Y/N","rehearsal_real_or_performed":"Real/Performed/Partial","body_present_rehearsal":"Y/N","v1_belief_resistant_to_identity_statement":"text","defence_mechanism_blocked_rehearsal":"text","shadow_question_answered":"Y/N","what_discovered_shadow":"text","escape_named_instead_of_taken":"Y/N","what_was_underneath_escape":"text","assumption_behind_escape":"text","secondary_gain_of_escape":"text","defence_mechanism_during_escape":"text","this_weeks_micro_action":"text","micro_action_done":"Y/N","resistance_level":"None/Low/Medium/High","sunday_checkin_done":"Y/N","pattern_claude_identified":"text","uncomfortable_truth_this_week":"text","next_week_single_focus":"text","signal_recognized_outside_trading":"Y/N","five_second_rule_applied_life":"Y/N","five_second_rule_window":"text","values_gap_today":"Y/N","values_gap_description":"text","unmet_need_reactive_moment":"text","window_of_tolerance_daily":0,"one_win_behavioral":"text","one_correction_tomorrow":"text","how_close_to_him_today":0}\n\nTranscript:`;
 
 /* ══ API HELPERS ═════════════════════════════════════════════════ */
-async function callClaude(ak, prompt, text, maxTok=600) {
+async function callClaude(ak, prompt, text, maxTok) {
   const res = await fetch('https://api.anthropic.com/v1/messages', {
     method:'POST',
     headers:{'Content-Type':'application/json','x-api-key':ak,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-    body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:maxTok,messages:[{role:'user',content:prompt+'\n'+(text||'')}]})
+    body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:maxTok||600,messages:[{role:'user',content:prompt+'\n'+(text||'')}]})
   });
   const data = await res.json();
   if(data.error) throw new Error('Claude: '+data.error.message);
@@ -207,22 +389,129 @@ async function callClaudeJSON(ak, prompt, text) {
 }
 
 async function writeTab(sid, tab, headers, keys, data) {
-  const vals = keys.map(k=>{const v=data[k];return(v===null||v===undefined)?'':String(v);});
-  const res = await fetch(SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({sheetId:sid,tab,headers,values:vals})});
+  const vals = keys.map(function(k){var v=data[k];return(v===null||v===undefined)?'':String(v);});
+  const res = await fetch(SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({sheetId:sid,tab:tab,headers:headers,values:vals})});
   const result = await res.json();
   if(result.error) throw new Error('Sheets: '+result.error);
-  return {keys,headers,data};
+  return {keys:keys,headers:headers,data:data};
 }
 
-function speakText(text) {
-  if(!window.speechSynthesis) return;
-  window.speechSynthesis.cancel();
-  const utt = new SpeechSynthesisUtterance(text);
-  utt.rate = 0.92; utt.pitch = 1.0; utt.volume = 1.0;
+/* ══ MARKDOWN STRIPPER (bug fix #3) ══════════════════════════════ */
+function stripMarkdown(txt) {
+  if(!txt) return '';
+  return txt
+    .replace(/^#{1,6}\s+/gm, '')              // headings ## etc
+    .replace(/\*\*(.+?)\*\*/g, '$1')          // bold **
+    .replace(/__(.+?)__/g, '$1')              // bold __
+    .replace(/\*([^\*\n]+?)\*/g, '$1')        // italic *
+    .replace(/_([^_\n]+?)_/g, '$1')           // italic _
+    .replace(/`([^`\n]+?)`/g, '$1')           // inline code
+    .replace(/```[\s\S]*?```/g, '')           // fenced code
+    .replace(/^\s*[-*+]\s+/gm, '• ')          // list markers → bullets
+    .replace(/^\|.*\|$/gm, function(line) {   // table rows: strip pipes
+       return line.replace(/\|/g, ' ').replace(/\s+/g, ' ').trim();
+    })
+    .replace(/^[\s|:-]+$/gm, '')              // table dividers
+    .replace(/━━+/g, '')                       // heavy lines
+    .replace(/═══+/g, '')                      // heavy double lines
+    .replace(/\n{3,}/g, '\n\n')                // collapse extra blank lines
+    .trim();
+}
+
+/* ══ VOICE UPGRADE (bug fix + voice priority + wake lock) ════════ */
+let cachedVoice = null;
+
+function pickVoice() {
+  if(cachedVoice) return cachedVoice;
   const voices = window.speechSynthesis.getVoices();
-  const preferred = voices.find(v=>v.name.includes('Samantha')||v.name.includes('Alex')||v.name.includes('Daniel'));
-  if(preferred) utt.voice = preferred;
+  if(!voices || !voices.length) return null;
+  const priorityExact = [
+    'Evan (Enhanced)','Evan (Premium)','Evan',
+    'Nathan (Enhanced)','Nathan (Premium)','Nathan',
+    'Tom (Enhanced)','Tom (Premium)','Tom',
+    'Alex (Enhanced)','Alex (Premium)','Alex',
+    'Lee (Enhanced)','Lee (Premium)','Lee'
+  ];
+  for(var i=0;i<priorityExact.length;i++) {
+    var v = voices.find(function(x){return x.name===priorityExact[i];});
+    if(v) { cachedVoice = v; return v; }
+  }
+  // any Enhanced/Premium English
+  var enh = voices.find(function(x){return /Enhanced|Premium/.test(x.name) && /^en/.test(x.lang);});
+  if(enh) { cachedVoice = enh; return enh; }
+  // any en-GB
+  var gb = voices.find(function(x){return x.lang==='en-GB';});
+  if(gb) { cachedVoice = gb; return gb; }
+  // any en-US
+  var us = voices.find(function(x){return x.lang==='en-US';});
+  if(us) { cachedVoice = us; return us; }
+  return voices[0];
+}
+
+// Warm voice list — iOS populates asynchronously
+if(window.speechSynthesis) {
+  window.speechSynthesis.onvoiceschanged = function(){ cachedVoice = null; pickVoice(); };
+  setTimeout(function(){ pickVoice(); }, 200);
+}
+
+// Wake lock (keeps screen on during voice playback)
+let wakeLock = null;
+async function requestWakeLock() {
+  try {
+    if('wakeLock' in navigator) {
+      wakeLock = await navigator.wakeLock.request('screen');
+    }
+  } catch(e) {}
+}
+function releaseWakeLock() {
+  try {
+    if(wakeLock) { wakeLock.release(); wakeLock = null; }
+  } catch(e) {}
+}
+
+async function speakText(text) {
+  if(!window.speechSynthesis || !text) return;
+  window.speechSynthesis.cancel();
+  await requestWakeLock();
+  // Chunk long text for reliability
+  const utt = new SpeechSynthesisUtterance(text);
+  utt.rate = 0.95; utt.pitch = 1.0; utt.volume = 1.0;
+  const v = pickVoice();
+  if(v) utt.voice = v;
+  utt.onend = function(){ releaseWakeLock(); };
+  utt.onerror = function(){ releaseWakeLock(); };
   window.speechSynthesis.speak(utt);
+}
+
+function stopSpeaking() {
+  if(window.speechSynthesis) window.speechSynthesis.cancel();
+  releaseWakeLock();
+}
+
+/* ══ VIEWPORT HOOK (bug fix #1 + #2: keyboard layout) ════════════ */
+function useViewportHeight() {
+  useEffect(function(){
+    function update() {
+      var vv = window.visualViewport;
+      var vh = vv ? vv.height : window.innerHeight;
+      document.documentElement.style.setProperty('--app-h', vh + 'px');
+    }
+    update();
+    if(window.visualViewport) {
+      window.visualViewport.addEventListener('resize', update);
+      window.visualViewport.addEventListener('scroll', update);
+    }
+    window.addEventListener('resize', update);
+    window.addEventListener('orientationchange', update);
+    return function(){
+      if(window.visualViewport) {
+        window.visualViewport.removeEventListener('resize', update);
+        window.visualViewport.removeEventListener('scroll', update);
+      }
+      window.removeEventListener('resize', update);
+      window.removeEventListener('orientationchange', update);
+    };
+  }, []);
 }
 
 /* ══ QUOTES ══════════════════════════════════════════════════════ */
@@ -245,6 +534,8 @@ const ALL_QUOTES=[
   {id:16,text:"Between stimulus and response there is a space. In that space is your power.",author:"Viktor Frankl"},
   {id:17,text:"Your father had zero layers. You have five. This is where the story changes.",author:"Avkar Coaching System"},
   {id:18,text:"V1 only works in the dark. Naming it turns the light on.",author:"Avkar Coaching System"},
+  {id:19,text:"Environment before price. No level, no trade. The approach is not the trade.",author:"Avkar Coaching System"},
+  {id:20,text:"The scenario tree collapses to one level and one behavior. That is the entire game.",author:"Avkar Coaching System"},
 ];
 
 /* ══ GUIDE DATA ══════════════════════════════════════════════════ */
@@ -253,12 +544,12 @@ const PM_GUIDE=[
   {s:"RITUALS DONE",c:"var(--teal)",pause:false,i:["Cold water done?","Light exercise done?","Visualization/meditation done?","Body scan — what did you notice?","Identity statement read?","Alarmy ritual done? Music on?"]},
   {s:"🔴 MENTAL STATE — yours",c:"var(--red)",pause:true,i:["Wanderer (V1) or Creator (V2) today?","What is my inner talk this morning?","Any active V1 belief right now?","Nervous system state — one word","Financial stress 1–10","Feeling survival pressure today?","Can I lose calmly today?"]},
   {s:"🔴 TODAY'S INTENTION — yours",c:"var(--amber)",pause:true,i:["My single behavioral goal today","What to avoid — be specific","One rule I will protect no matter what","Max loss today / Max trades today","Dopamine bridge — my reward after session"]},
-  {s:"MARKET CONTEXT",c:"var(--purple)",pause:false,i:["Major news today?","QQQ vs 2-Day AVWAP — above or below?","Overall bias — bullish/bearish/neutral?","Key NQ levels today","Futures direction"]},
+  {s:"MARKET CONTEXT",c:"var(--purple)",pause:false,i:["Previous day candle — strong green/red/doji/hammer/pin/normal?","QQQ vs 2-Day AVWAP — above or below?","Overall bias — bullish/bearish/neutral","Key NQ levels today","Mag7 strength — bullish/bearish/mixed","Futures direction","Open scenario — which of the three"]},
   {s:"🔴 PLAN — think and commit",c:"var(--teal)",pause:true,i:["Main plan today — one sentence","Entry type — anticipated or confirmed?","Entry trigger and confirmation signal","Stop level and invalidation","Two scenarios I am prepared for"]},
 ];
 const TL_GUIDE=[
-  {s:"TRADE BASICS",c:"var(--teal)",pause:false,i:["Entry time, direction, entry price","Contracts/size, account type","Profit target % before this trade","Setup name"]},
-  {s:"🔴 PRE-ENTRY — yours",c:"var(--amber)",pause:true,i:["Was signal confirmed or did I enter early?","Was FOMO involved?","Wanderer or Creator mindset at entry?","What did my body feel at entry?","Did I remove hand from mouse first?"]},
+  {s:"TRADE BASICS",c:"var(--teal)",pause:false,i:["Entry time, direction, entry price","Contracts/size, account type","Profit target % before this trade","Setup name — main or scalp"]},
+  {s:"🔴 PRE-ENTRY — yours",c:"var(--amber)",pause:true,i:["Three Questions: environment / level / confirmation — all three?","Was the candle CLOSED before I entered?","Was FOMO involved?","Wanderer or Creator mindset at entry?","What did my body feel at entry?","Did I remove hand from mouse first?"]},
   {s:"LEVELS",c:"var(--teal)",pause:false,i:["Planned entry vs actual entry","Planned stop vs actual stop","Invalidation level, target level","Exit level, P&L, exit reason"]},
   {s:"🔴 EXECUTION — yours",c:"var(--red)",pause:true,i:["Did I follow the exact plan?","If no — what changed and why?","Did I move stop or exit early?","Did size increase after a loss?","Was this a recovery or zombie trade?"]},
   {s:"🔴 EMOTIONS — feel and speak",c:"var(--purple)",pause:true,i:["Emotion before entry — one word","Emotion during trade — one word","Emotion at exit — one word","Body sensation, tilt stage (none/1/2/3)","Survival pressure? Cortisol spike?"]},
@@ -281,29 +572,31 @@ const META={
 };
 
 /* ══ STARS ═══════════════════════════════════════════════════════ */
-const STARS=Array.from({length:40},(_,i)=>({id:i,x:Math.random()*100,y:Math.random()*100,s:Math.random()*1.4+0.4,o:Math.random()*0.18+0.06}));
-function Stars(){return h('div',{style:{position:'fixed',inset:0,pointerEvents:'none',zIndex:0}},STARS.map(s=>h('div',{key:s.id,style:{position:'absolute',left:s.x+'%',top:s.y+'%',width:s.s,height:s.s,borderRadius:'50%',background:'#b0bcd0',opacity:s.o}})));}
+const STARS=Array.from({length:40},function(_,i){return{id:i,x:Math.random()*100,y:Math.random()*100,s:Math.random()*1.4+0.4,o:Math.random()*0.18+0.06};});
+function Stars(){return h('div',{style:{position:'fixed',inset:0,pointerEvents:'none',zIndex:0}},STARS.map(function(s){return h('div',{key:s.id,style:{position:'absolute',left:s.x+'%',top:s.y+'%',width:s.s,height:s.s,borderRadius:'50%',background:'#b0bcd0',opacity:s.o}});}));}
 
 /* ══ GUIDE PANEL ═════════════════════════════════════════════════ */
-function GuidePanel({guide}){
+function GuidePanel(props){
+  var guide = props.guide;
   return h('div',{style:{width:'30%',flexShrink:0,overflowY:'auto',padding:'16px 12px 16px 18px',borderRight:'1px solid var(--border)',height:'100%'}},
-    guide.map(b=>h('div',{key:b.s,style:{marginBottom:20}},
+    guide.map(function(b){return h('div',{key:b.s,style:{marginBottom:20}},
       h('div',{style:{display:'flex',alignItems:'center',gap:8,marginBottom:9,paddingBottom:6,borderBottom:'1px solid var(--border)'}},
         h('div',{style:{width:8,height:8,borderRadius:'50%',background:b.c,flexShrink:0}}),
         h('span',{style:{color:b.c,fontSize:10,letterSpacing:2,fontFamily:'monospace',fontWeight:700}},b.s),
         b.pause&&h('span',{style:{marginLeft:'auto',background:'rgba(212,149,106,.15)',border:'1px solid rgba(212,149,106,.3)',color:'var(--amber-l)',fontSize:9,fontFamily:'monospace',padding:'1px 7px',borderRadius:10,letterSpacing:1}},'REFLECT')
       ),
-      b.i.map(item=>h('div',{key:item,style:{display:'flex',alignItems:'flex-start',gap:10,marginBottom:8}},
+      b.i.map(function(item){return h('div',{key:item,style:{display:'flex',alignItems:'flex-start',gap:10,marginBottom:8}},
         h('div',{style:{width:b.pause?7:5,height:b.pause?7:5,borderRadius:'50%',background:b.pause?b.c:'var(--border2)',flexShrink:0,marginTop:5}}),
         h('span',{style:{fontSize:b.pause?14:13,fontWeight:b.pause?700:500,color:b.pause?'var(--amber-l)':'var(--text1)',lineHeight:1.5,fontFamily:'monospace'}},item)
-      ))
-    ))
+      );})
+    );})
   );
 }
 
 /* ══ COACHING RESPONSE DISPLAY ═══════════════════════════════════ */
-function CoachingDisplay({text, onClose, onSpeak, speaking}){
-  return h('div',{style:{position:'fixed',inset:0,background:'rgba(10,13,20,.97)',zIndex:200,display:'flex',flexDirection:'column',overflow:'hidden'}},
+function CoachingDisplay(props){
+  var text = props.text, onClose = props.onClose, onSpeak = props.onSpeak, speaking = props.speaking;
+  return h('div',{className:'app-screen',style:{position:'fixed',inset:0,background:'rgba(10,13,20,.97)',zIndex:200}},
     h('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'14px 20px',borderBottom:'1px solid var(--border)',flexShrink:0,background:'var(--bg2)'}},
       h('span',{style:{color:'var(--amber)',fontFamily:'monospace',fontSize:13,letterSpacing:2,fontWeight:700}},'✦  COACHING RESPONSE'),
       h('div',{style:{display:'flex',gap:10}},
@@ -314,38 +607,41 @@ function CoachingDisplay({text, onClose, onSpeak, speaking}){
     h('div',{style:{flex:1,overflowY:'auto',padding:'24px 22px'}},
       h('div',{style:{color:'var(--text1)',fontSize:16,lineHeight:2.0,fontFamily:'Georgia,serif',whiteSpace:'pre-wrap'}},text)
     ),
-    h('div',{style:{flexShrink:0,padding:'14px 20px',borderTop:'1px solid var(--border)',background:'var(--bg2)'}},
+    h('div',{className:'submit-bar',style:{padding:'14px 20px',background:'var(--bg2)'}},
       h('button',{onClick:onClose,style:{width:'100%',background:'linear-gradient(135deg,var(--amber-d),var(--amber))',border:'none',borderRadius:11,color:'#fff',padding:'14px',fontFamily:'monospace',fontSize:13,fontWeight:900,letterSpacing:2}},'DONE — LOG NEXT ENTRY')
     )
   );
 }
 
-/* ══ INTERVENTION SCREEN ════════════════════════════════════════ */
-function InterventionScreen({text, score, onProceed, onSpeak, speaking}){
-  const color = score<=4?'var(--red)':score<=7?'var(--amber)':'var(--green)';
-  const label = score<=4?'NOT READY':score<=7?'CAUTION':'READY';
-  return h('div',{style:{position:'fixed',inset:0,background:'rgba(10,13,20,.99)',zIndex:200,display:'flex',flexDirection:'column',overflow:'hidden'}},
+/* ══ INTERVENTION SCREEN ═════════════════════════════════════════ */
+function InterventionScreen(props){
+  var text = props.text, score = props.score, onProceed = props.onProceed, onSpeak = props.onSpeak, speaking = props.speaking;
+  var color = score<=4?'var(--red)':score<=7?'var(--amber)':'var(--green)';
+  var label = score<=4?'NOT READY':score<=7?'CAUTION':'READY';
+  return h('div',{className:'app-screen',style:{position:'fixed',inset:0,background:'rgba(10,13,20,.99)',zIndex:200}},
     h('div',{style:{padding:'16px 20px',borderBottom:'1px solid var(--border)',background:'var(--bg2)',flexShrink:0,display:'flex',alignItems:'center',justifyContent:'space-between'}},
       h('span',{style:{color:'var(--amber)',fontFamily:'monospace',fontSize:13,letterSpacing:2,fontWeight:700}},'✦  PRE-SESSION CHECK'),
-      h('div',{style:{background:color+'22',border:`1px solid ${color}44`,color,fontFamily:'monospace',fontSize:11,fontWeight:700,letterSpacing:2,padding:'5px 14px',borderRadius:20}},`${score}/10 — ${label}`)
+      h('div',{style:{background:color+'22',border:'1px solid '+color+'44',color:color,fontFamily:'monospace',fontSize:11,fontWeight:700,letterSpacing:2,padding:'5px 14px',borderRadius:20}},score+'/10 — '+label)
     ),
     h('div',{style:{flex:1,overflowY:'auto',padding:'24px 22px'}},
       h('div',{style:{color:'var(--text1)',fontSize:15,lineHeight:1.95,fontFamily:'Georgia,serif',whiteSpace:'pre-wrap'}},text)
     ),
-    h('div',{style:{flexShrink:0,padding:'14px 20px',borderTop:'1px solid var(--border)',background:'var(--bg2)',display:'flex',gap:10}},
+    h('div',{className:'submit-bar',style:{padding:'14px 20px',background:'var(--bg2)',display:'flex',gap:10}},
       h('button',{onClick:onSpeak,style:{background:speaking?'var(--amber)':'var(--bg3)',border:'1px solid var(--border2)',color:speaking?'#000':'var(--text2)',borderRadius:10,padding:'13px 18px',fontFamily:'monospace',fontSize:12,fontWeight:700}},speaking?'⏹':'🔊'),
-      h('button',{onClick:onProceed,style:{flex:1,background:score<=4?'linear-gradient(135deg,#8a3030,var(--red))':'linear-gradient(135deg,var(--amber-d),var(--amber))',border:'none',borderRadius:11,color:'#fff',padding:'14px',fontFamily:'monospace',fontSize:13,fontWeight:900,letterSpacing:2}},score<=4?'I UNDERSTAND — PROCEED WITH CAUTION':'OPEN SESSION →')
+      h('button',{onClick:onProceed,style:{flex:1,background:score<=4?'linear-gradient(135deg,#8a3030,var(--red))':'linear-gradient(135deg,var(--amber-d),var(--amber))',border:'none',borderRadius:11,color:'#fff',padding:'14px',fontFamily:'monospace',fontSize:13,fontWeight:900,letterSpacing:2}},score<=4?'I UNDERSTAND — CONTINUE':'CONTINUE →')
     )
   );
 }
 
-/* ══ WEEKLY ANALYSIS SCREEN ═════════════════════════════════════ */
-function WeeklyScreen({onBack}){
-  const [status,setStatus] = useState('idle'); // idle|loading|chatting|done
+/* ══ WEEKLY ANALYSIS SCREEN ══════════════════════════════════════ */
+function WeeklyScreen(props){
+  useViewportHeight();
+  const [status,setStatus] = useState('idle');
   const [messages,setMessages] = useState([]);
   const [input,setInput] = useState('');
   const [csvLoaded,setCsvLoaded] = useState(false);
   const [csvText,setCsvText] = useState('');
+  const [speaking,setSpeaking] = useState(false);
   const fileRef = useRef(null);
   const ak = lget('ak','');
   const prevReport = lget('prev_sunday_report','');
@@ -363,8 +659,8 @@ function WeeklyScreen({onBack}){
     setStatus('loading');
     try {
       const prompt = WEEKLY_PROMPT(csvText, prevReport);
-      const response = await callClaude(ak, prompt, '', 2000);
-      setMessages([{role:'coach',text:response}]);
+      const response = await callClaude(ak, prompt, '', 2500);
+      setMessages([{role:'coach',text:stripMarkdown(response)}]);
       setStatus('chatting');
     } catch(e) { setMessages([{role:'coach',text:'Error: '+e.message}]); setStatus('chatting'); }
   };
@@ -375,56 +671,65 @@ function WeeklyScreen({onBack}){
     const updated = [...messages,{role:'avkar',text:userMsg}];
     setMessages(updated); setStatus('loading');
     try {
-      const history = updated.map(m=>`${m.role==='coach'?'Coach':'Avkar'}: ${m.text}`).join('\n\n');
-      const continuePrompt = `${MASTER_CTX}\n\nYou are mid-way through Avkar's Sunday recalibration session. Continue the coaching conversation. Stay in the protocol. One concept at a time. End with one physical action.\n\nCONVERSATION SO FAR:\n${history}\n\nRespond as coach now:`;
-      const reply = await callClaude(ak, continuePrompt, '', 800);
-      setMessages([...updated,{role:'coach',text:reply}]);
+      const history = updated.map(function(m){return (m.role==='coach'?'Coach':'Avkar')+': '+m.text;}).join('\n\n');
+      const continuePrompt = MASTER_CTX + '\n\nYou are mid-way through Avkar\'s Sunday recalibration. Continue the coaching conversation. Stay in the protocol. One concept at a time. End with one physical action. Plain text only — no markdown.\n\nCONVERSATION SO FAR:\n'+history+'\n\nRespond as coach now:';
+      const reply = await callClaude(ak, continuePrompt, '', 1000);
+      setMessages([...updated,{role:'coach',text:stripMarkdown(reply)}]);
       setStatus('chatting');
     } catch(e) { setStatus('chatting'); }
   };
 
   const saveReport = () => {
-    const reportText = messages.filter(m=>m.role==='coach').map(m=>m.text).join('\n\n---\n\n');
-    lset('prev_sunday_report', `SUNDAY REPORT ${TODAY}:\n${reportText}`);
+    const reportText = messages.filter(function(m){return m.role==='coach';}).map(function(m){return m.text;}).join('\n\n---\n\n');
+    lset('prev_sunday_report', 'SUNDAY REPORT '+TODAY+':\n'+reportText);
     alert('Report saved for next week reference.');
   };
 
-  return h('div',{style:{display:'flex',flexDirection:'column',height:'100vh',height:'100dvh',position:'relative',zIndex:1,overflow:'hidden'}},
+  const speakLast = () => {
+    if(speaking) { stopSpeaking(); setSpeaking(false); return; }
+    const lastCoach = [...messages].reverse().find(function(m){return m.role==='coach';});
+    if(!lastCoach) return;
+    speakText(lastCoach.text); setSpeaking(true);
+    const check = setInterval(function(){if(!window.speechSynthesis.speaking){setSpeaking(false);clearInterval(check);}},500);
+  };
+
+  return h('div',{className:'app-screen',style:{position:'relative',zIndex:1}},
     h('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'13px 22px',borderBottom:'1px solid var(--border)',flexShrink:0,background:'var(--bg2)'}},
       h('span',{style:{color:'var(--amber)',fontFamily:'monospace',fontSize:14,letterSpacing:2,fontWeight:700}},'✦  SUNDAY RECALIBRATION'),
-      h('button',{className:'btn-nav',onClick:onBack},'← Back')
+      h('button',{className:'btn-nav',onClick:props.onBack},'← Back')
     ),
     status==='idle'&&h('div',{style:{flex:1,overflowY:'auto',padding:'28px 22px'}},
       h('div',{style:{borderLeft:'3px solid var(--amber-d)',paddingLeft:18,marginBottom:28,color:'var(--text2)',fontStyle:'italic',fontSize:15,lineHeight:1.8}},'The Sunday session only works if you bring real data and real answers. The data is the truth.'),
       h('div',{style:{color:'var(--text1)',fontSize:20,fontWeight:700,marginBottom:6}},'Upload Your Week\'s Data'),
-      h('div',{style:{color:'var(--text2)',fontSize:13,marginBottom:24,lineHeight:1.7}},'Export your Google Sheet as CSV (File → Download → CSV) then upload it here. Claude will run the full 7-step weekly analysis.'),
-      !csvLoaded&&h('button',{onClick:()=>fileRef.current.click(),style:{width:'100%',background:'var(--bg2)',border:'2px dashed var(--border2)',borderRadius:14,color:'var(--text2)',padding:'40px 20px',fontFamily:'monospace',fontSize:14,letterSpacing:1,marginBottom:16}},'📂   TAP TO UPLOAD CSV FILE'),
+      h('div',{style:{color:'var(--text2)',fontSize:13,marginBottom:24,lineHeight:1.7}},'Export your Google Sheet as CSV (File → Download → CSV) then upload it here.'),
+      !csvLoaded&&h('button',{onClick:function(){fileRef.current.click();},style:{width:'100%',background:'var(--bg2)',border:'2px dashed var(--border2)',borderRadius:14,color:'var(--text2)',padding:'40px 20px',fontFamily:'monospace',fontSize:14,letterSpacing:1,marginBottom:16}},'📂   TAP TO UPLOAD CSV FILE'),
       h('input',{ref:fileRef,type:'file',accept:'.csv',onChange:handleFile,style:{display:'none'}}),
       csvLoaded&&h('div',{style:{background:'var(--bg2)',border:'1px solid var(--green)',borderRadius:12,padding:'16px 20px',marginBottom:20,display:'flex',alignItems:'center',gap:12}},
         h('span',{style:{fontSize:20}},'✓'),
         h('div',null,
           h('div',{style:{color:'var(--green)',fontFamily:'monospace',fontSize:13,fontWeight:700}},'CSV Loaded'),
-          h('div',{style:{color:'var(--text3)',fontFamily:'monospace',fontSize:11,marginTop:2}},`${csvText.split('\n').length} rows of data`)
+          h('div',{style:{color:'var(--text3)',fontFamily:'monospace',fontSize:11,marginTop:2}},csvText.split('\n').length+' rows of data')
         )
       ),
       csvLoaded&&h('button',{onClick:startAnalysis,style:{width:'100%',background:'linear-gradient(135deg,var(--amber-d),var(--amber))',border:'none',borderRadius:14,color:'#fff',fontSize:15,fontWeight:900,letterSpacing:3,fontFamily:'monospace',padding:'20px'}},'START ANALYSIS →')
     ),
-    status==='loading'&&h('div',{style:{flex:1,display:'flex',alignItems:'center',justifyContent:'center',flexDirection:'column',gap:16}},
+    status==='loading'&&messages.length===0&&h('div',{style:{flex:1,display:'flex',alignItems:'center',justifyContent:'center',flexDirection:'column',gap:16}},
       h('div',{style:{fontSize:40}},'⏳'),
       h('div',{style:{color:'var(--amber)',fontFamily:'monospace',fontSize:14,letterSpacing:2}},'CLAUDE IS READING YOUR WEEK...')
     ),
-    status==='chatting'&&h('div',{style:{flex:1,display:'flex',flexDirection:'column',overflow:'hidden'}},
+    (status==='chatting'||(status==='loading'&&messages.length>0))&&h('div',{style:{flex:1,display:'flex',flexDirection:'column',overflow:'hidden'}},
       h('div',{style:{flex:1,overflowY:'auto',padding:'16px 18px',display:'flex',flexDirection:'column',gap:16}},
-        messages.map((m,i)=>h('div',{key:i,style:{alignSelf:m.role==='coach'?'flex-start':'flex-end',maxWidth:'88%',background:m.role==='coach'?'var(--bg2)':'var(--bg3)',border:`1px solid ${m.role==='coach'?'var(--border)':'var(--amber-d)'}`,borderRadius:12,padding:'14px 16px'}},
+        messages.map(function(m,i){return h('div',{key:i,style:{alignSelf:m.role==='coach'?'flex-start':'flex-end',maxWidth:'88%',background:m.role==='coach'?'var(--bg2)':'var(--bg3)',border:'1px solid '+(m.role==='coach'?'var(--border)':'var(--amber-d)'),borderRadius:12,padding:'14px 16px'}},
           h('div',{style:{color:m.role==='coach'?'var(--amber)':'var(--amber-d)',fontFamily:'monospace',fontSize:10,letterSpacing:2,marginBottom:8,fontWeight:700}},m.role==='coach'?'COACH':'AVKAR'),
           h('div',{style:{color:'var(--text1)',fontSize:14,lineHeight:1.8,fontFamily:'Georgia,serif',whiteSpace:'pre-wrap'}},m.text)
-        )),
+        );}),
         status==='loading'&&h('div',{style:{color:'var(--amber)',fontFamily:'monospace',fontSize:12,padding:'8px 0'}},'...')
       ),
-      h('div',{style:{flexShrink:0,padding:'10px 14px',borderTop:'1px solid var(--border)',background:'var(--bg2)',display:'flex',gap:8,alignItems:'flex-end'}},
-        h('textarea',{value:input,onChange:e=>setInput(e.target.value),placeholder:'Your response...',style:{flex:1,minHeight:60,maxHeight:120,fontSize:14,padding:'10px 12px',background:'var(--bg)',border:'1px solid var(--border2)',borderRadius:10,resize:'none',fontFamily:'Georgia,serif',color:'var(--text1)'}}),
+      h('div',{className:'submit-bar',style:{padding:'10px 14px',background:'var(--bg2)',display:'flex',gap:8,alignItems:'flex-end'}},
+        h('textarea',{value:input,onChange:function(e){setInput(e.target.value);},placeholder:'Your response...',style:{flex:1,minHeight:60,maxHeight:120,fontSize:14,padding:'10px 12px',background:'var(--bg)',border:'1px solid var(--border2)',borderRadius:10,resize:'none',fontFamily:'Georgia,serif',color:'var(--text1)'}}),
         h('div',{style:{display:'flex',flexDirection:'column',gap:6}},
           h('button',{onClick:sendReply,style:{background:'linear-gradient(135deg,var(--amber-d),var(--amber))',border:'none',borderRadius:10,color:'#fff',padding:'14px 18px',fontFamily:'monospace',fontSize:12,fontWeight:900,letterSpacing:1}},'SEND'),
+          h('button',{onClick:speakLast,style:{background:speaking?'var(--amber)':'var(--bg3)',border:'1px solid var(--border2)',borderRadius:10,color:speaking?'#000':'var(--text3)',padding:'10px 14px',fontFamily:'monospace',fontSize:11}},speaking?'⏹':'🔊'),
           h('button',{onClick:saveReport,style:{background:'var(--bg3)',border:'1px solid var(--border2)',borderRadius:10,color:'var(--text3)',padding:'10px 14px',fontFamily:'monospace',fontSize:11}},'SAVE')
         )
       )
@@ -433,34 +738,36 @@ function WeeklyScreen({onBack}){
 }
 
 /* ══ SETTINGS MODAL ══════════════════════════════════════════════ */
-function SettingsModal({onClose}){
+function SettingsModal(props){
   const [ak,setAk]=useState(lget('ak',''));
   const [sid,setSid]=useState(lget('sid',''));
   const [msg,setMsg]=useState('');
-  const save=()=>{
+  const save=function(){
     if(!ak.trim()||!sid.trim()){setMsg('Please fill both fields.');return;}
     lset('ak',ak.trim());lset('sid',sid.trim());
-    setMsg('Saved ✓');setTimeout(onClose,700);
+    setMsg('Saved ✓');setTimeout(props.onClose,700);
   };
   return h('div',{style:{position:'fixed',inset:0,background:'rgba(10,13,20,.97)',zIndex:300,display:'flex',alignItems:'center',justifyContent:'center',padding:16}},
     h('div',{style:{background:'var(--bg2)',border:'1px solid var(--border2)',borderRadius:16,padding:24,width:'100%',maxWidth:500}},
       h('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:20}},
         h('span',{style:{color:'var(--amber)',fontFamily:'monospace',fontSize:13,letterSpacing:2,fontWeight:700}},'⚙  SETTINGS'),
-        h('button',{onClick:onClose,style:{background:'none',border:'none',color:'var(--text3)',fontSize:24,lineHeight:1}},'✕')
+        h('button',{onClick:props.onClose,style:{background:'none',border:'none',color:'var(--text3)',fontSize:24,lineHeight:1}},'✕')
       ),
       h('div',{style:{color:'var(--text3)',fontFamily:'monospace',fontSize:10,letterSpacing:1,marginBottom:6}},'ANTHROPIC API KEY'),
-      h('input',{type:'password',value:ak,onChange:e=>setAk(e.target.value),placeholder:'sk-ant-api03-...',style:{width:'100%',background:'var(--bg)',border:'1px solid var(--border2)',borderRadius:8,color:'var(--text1)',padding:'12px 14px',fontSize:14,fontFamily:'monospace',marginBottom:16}}),
+      h('input',{type:'password',value:ak,onChange:function(e){setAk(e.target.value);},placeholder:'sk-ant-api03-...',style:{width:'100%',background:'var(--bg)',border:'1px solid var(--border2)',borderRadius:8,color:'var(--text1)',padding:'12px 14px',fontSize:14,fontFamily:'monospace',marginBottom:16}}),
       h('div',{style:{color:'var(--text3)',fontFamily:'monospace',fontSize:10,letterSpacing:1,marginBottom:6}},'GOOGLE SPREADSHEET ID'),
-      h('input',{type:'text',value:sid,onChange:e=>setSid(e.target.value),placeholder:'From sheet URL: /d/YOUR_ID/edit',style:{width:'100%',background:'var(--bg)',border:'1px solid var(--border2)',borderRadius:8,color:'var(--text1)',padding:'12px 14px',fontSize:14,fontFamily:'monospace',marginBottom:8}}),
+      h('input',{type:'text',value:sid,onChange:function(e){setSid(e.target.value);},placeholder:'From sheet URL: /d/YOUR_ID/edit',style:{width:'100%',background:'var(--bg)',border:'1px solid var(--border2)',borderRadius:8,color:'var(--text1)',padding:'12px 14px',fontSize:14,fontFamily:'monospace',marginBottom:8}}),
       h('div',{style:{color:'var(--text3)',fontFamily:'monospace',fontSize:11,marginBottom:18,lineHeight:1.7}},'Sheet name: Trading Journal 2026'),
-      msg&&h('div',{style:{color:msg.includes('✓')?'var(--green)':'var(--red)',fontFamily:'monospace',fontSize:12,marginBottom:12}},msg),
+      msg&&h('div',{style:{color:msg.indexOf('✓')>=0?'var(--green)':'var(--red)',fontFamily:'monospace',fontSize:12,marginBottom:12}},msg),
       h('button',{onClick:save,style:{width:'100%',background:'linear-gradient(135deg,var(--amber-d),var(--amber))',border:'none',borderRadius:11,color:'#fff',padding:'15px',fontFamily:'monospace',fontSize:14,fontWeight:900,letterSpacing:2}},'SAVE')
     )
   );
 }
 
 /* ══ JOURNAL SCREEN ══════════════════════════════════════════════ */
-function JournalScreen({session,onBack}){
+function JournalScreen(props){
+  useViewportHeight();
+  const session = props.session;
   const [showGuide,setShowGuide]=useState(true);
   const [text,setText]=useState('');
   const [status,setStatus]=useState('idle');
@@ -472,117 +779,152 @@ function JournalScreen({session,onBack}){
   const words=text.trim()?text.trim().split(/\s+/).length:0;
   const ak=lget('ak',''); const sid=lget('sid','');
 
-  const speak=(t)=>{
-    if(speaking){window.speechSynthesis.cancel();setSpeaking(false);return;}
+  const speak=function(t){
+    if(speaking){stopSpeaking();setSpeaking(false);return;}
     speakText(t); setSpeaking(true);
-    const check=setInterval(()=>{if(!window.speechSynthesis.speaking){setSpeaking(false);clearInterval(check);}},500);
+    const check=setInterval(function(){if(!window.speechSynthesis.speaking){setSpeaking(false);clearInterval(check);}},500);
   };
 
-  const handleSave=async()=>{
+  const handleSave=async function(){
     if(!text.trim()) return;
     if(!ak||!sid){setStatusMsg('Missing credentials — tap ⚙ Settings on home screen.');setStatus('error');return;}
     setStatus('saving'); setStatusMsg('');
     try {
       let extractedData = null;
+      let interventionData = null;  // LOCAL variable — not state
+
       if(session==='premarket'){
         setStatusMsg('Extracting pre-market fields…');
-        const d=await callClaudeJSON(ak,PM_EXTRACT,text);
-        setStatusMsg('Writing to Google Sheets…');
+        const d = await callClaudeJSON(ak,PM_EXTRACT,text);
+        setStatusMsg('Writing Pre-Market Prep tab…');
         await writeTab(sid,'Pre-Market Prep',T1H,T1K,d);
-        extractedData={sessionType:'PRE-MARKET',data:d};
-        // Pre-session intervention
+        // Save PM data for EOD coaching context (Pre-Market → EOD connection)
+        lset('last_premarket_data', JSON.stringify({date:TODAY,data:d}));
+        extractedData = {sessionType:'PRE-MARKET',data:d};
         setStatusMsg('Running readiness check…');
-        const intText=await callClaude(ak,PRE_SESSION_PROMPT(d),'',400);
-        const scoreMatch=intText.match(/(\d+)\/10/);
-        const score=scoreMatch?parseInt(scoreMatch[1]):5;
-        setIntervention({text:intText,score});
+        const intText = await callClaude(ak,PRE_SESSION_PROMPT(d),'',500);
+        const cleanInt = stripMarkdown(intText);
+        const scoreMatch = cleanInt.match(/(\d+)\s*\/\s*10/);
+        const score = scoreMatch?parseInt(scoreMatch[1]):5;
+        interventionData = {text:cleanInt,score:score};
       } else if(session==='tradelog'){
         setStatusMsg('Extracting trade fields…');
-        const d=await callClaudeJSON(ak,TL_EXTRACT,text);
-        setStatusMsg('Writing to Google Sheets…');
+        const d = await callClaudeJSON(ak,TL_EXTRACT,text);
+        setStatusMsg('Writing Trade Log tab…');
         await writeTab(sid,'Trade Log',T2H,T2K,d);
-        extractedData={sessionType:'TRADE LOG',data:d};
+        extractedData = {sessionType:'TRADE LOG',data:d};
       } else {
         setStatusMsg('Extracting EOD data (1/2)…');
-        const d3=await callClaudeJSON(ak,E3_EXTRACT,text);
+        const d3 = await callClaudeJSON(ak,E3_EXTRACT,text);
         setStatusMsg('Extracting identity data (2/2)…');
-        const d4=await callClaudeJSON(ak,E4_EXTRACT,text);
-        if(!d4.date&&d3.date)d4.date=d3.date;
+        const d4 = await callClaudeJSON(ak,E4_EXTRACT,text);
+        if(!d4.date&&d3.date) d4.date=d3.date;
         setStatusMsg('Writing EOD Debrief…');
         await writeTab(sid,'EOD Debrief',T3H,T3K,d3);
         setStatusMsg('Writing Daily Life & Identity…');
         await writeTab(sid,'Daily Life & Identity',T4H,T4K,d4);
-        extractedData={sessionType:'END OF DAY',data:{...d3,...d4}};
+        extractedData = {sessionType:'END OF DAY',data:Object.assign({},d3,d4)};
       }
-      // Get coaching response
+
+      // Generate coaching — with premarket context for EOD
       setStatusMsg('Generating coaching response…');
-      const coachTxt=await callClaude(ak,DAILY_COACH_PROMPT(extractedData.sessionType,extractedData.data),'',600);
-      // Save to Coaching Log
+      let premarketContext = '';
+      if(session==='eod'){
+        try {
+          const saved = lget('last_premarket_data','');
+          if(saved) {
+            const parsed = JSON.parse(saved);
+            if(parsed.date===TODAY) premarketContext = JSON.stringify(parsed.data);
+          }
+        } catch(e){}
+      }
+      const coachTxt = await callClaude(ak,DAILY_COACH_PROMPT(extractedData.sessionType,extractedData.data,premarketContext),'',700);
+      const cleanCoach = stripMarkdown(coachTxt);
+
+      // Write Coaching Log with LOCAL interventionData (bug fix #4)
+      setStatusMsg('Saving coaching log…');
       const clData={
-        date:TODAY, session_type:extractedData.sessionType,
-        readiness_score:intervention?String(intervention.score):'',
+        date:TODAY,
+        session_type:extractedData.sessionType,
+        readiness_score:interventionData?String(interventionData.score):'',
         emotional_state:extractedData.data.feeling_emotional_state||extractedData.data.nervous_system_state||extractedData.data.overall_emotional_state||'',
-        coaching_response:coachTxt,
-        intervention_triggered:intervention?(intervention.score<=7?'Y':'N'):'N',
-        intervention_type:intervention&&intervention.score<=7?'Pre-session readiness':'',
+        coaching_response:cleanCoach,
+        intervention_triggered:interventionData?(interventionData.score<=7?'Y':'N'):'N',
+        intervention_type:interventionData&&interventionData.score<=7?'Pre-session readiness':'',
         daily_pattern_identified:extractedData.data.pattern_claude_identified||'',
-        key_insight_today:'', weekly_summary:''
+        key_insight_today:'',
+        weekly_summary:''
       };
       await writeTab(sid,'Coaching Log',TCH,TCK,clData);
+
+      // Clean up
       setText('');
       setStatus('idle'); setStatusMsg('');
-      if(!intervention) setCoaching(coachTxt);
+
+      // Show intervention first (with pending coaching attached), OR show coaching directly
+      if(interventionData){
+        setIntervention({text:interventionData.text,score:interventionData.score,pendingCoaching:cleanCoach});
+      } else {
+        setCoaching(cleanCoach);
+      }
     } catch(e){setStatus('error');setStatusMsg(e.message);}
   };
 
-  const btnBg=status==='saving'?'var(--bg3)':status==='error'?'linear-gradient(135deg,#8a3030,var(--red))':'linear-gradient(135deg,var(--amber-d),var(--amber))';
-  const btnTxt=status==='saving'?statusMsg||'SAVING...':status==='error'?'⚠ ERROR — TAP TO RETRY':'EXTRACT & SAVE TO GOOGLE SHEETS →';
+  const proceedFromIntervention = function(){
+    const pending = intervention ? intervention.pendingCoaching : null;
+    setIntervention(null);
+    if(pending) setCoaching(pending);
+  };
 
-  if(coaching) return h(CoachingDisplay,{text:coaching,onClose:()=>setCoaching(null),onSpeak:()=>speak(coaching),speaking});
-  if(intervention) return h(InterventionScreen,{text:intervention.text,score:intervention.score,onProceed:()=>{setIntervention(null);setCoaching(null);},onSpeak:()=>speak(intervention.text),speaking});
+  if(coaching) return h(CoachingDisplay,{text:coaching,onClose:function(){setCoaching(null);},onSpeak:function(){speak(coaching);},speaking:speaking});
+  if(intervention) return h(InterventionScreen,{text:intervention.text,score:intervention.score,onProceed:proceedFromIntervention,onSpeak:function(){speak(intervention.text);},speaking:speaking});
 
-  return h('div',{style:{display:'flex',flexDirection:'column',height:'100vh',height:'100dvh',position:'relative',zIndex:1,overflow:'hidden'}},
+  const btnBg = status==='saving'?'var(--bg3)':status==='error'?'linear-gradient(135deg,#8a3030,var(--red))':'linear-gradient(135deg,var(--amber-d),var(--amber))';
+  const btnTxt = status==='saving'?(statusMsg||'SAVING...'):status==='error'?'⚠ ERROR — TAP TO RETRY':'EXTRACT & SAVE TO GOOGLE SHEETS →';
+
+  return h('div',{className:'app-screen',style:{position:'relative',zIndex:1}},
     h('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'13px 22px',borderBottom:'1px solid var(--border)',flexShrink:0,background:'var(--bg2)'}},
       h('span',{style:{color:'var(--amber)',fontFamily:'monospace',fontSize:14,letterSpacing:2,fontWeight:700}},'✦  AVKAR · JOURNAL'),
-      h('button',{className:'btn-nav',onClick:onBack},'← Back')
+      h('button',{className:'btn-nav',onClick:props.onBack},'← Back')
     ),
     h('div',{style:{padding:'10px 22px',borderBottom:'1px solid var(--border)',flexShrink:0,display:'flex',alignItems:'center',gap:14,background:'var(--bg2)'}},
       h('span',{style:{background:'var(--bg3)',border:'1px solid var(--border2)',color:meta.color,fontFamily:'monospace',fontSize:11,padding:'4px 16px',borderRadius:20,letterSpacing:2,fontWeight:700}},meta.label),
       h('span',{style:{color:'var(--text3)',fontFamily:'monospace',fontSize:12}},meta.sub)
     ),
-    h('button',{onClick:()=>setShowGuide(v=>!v),style:{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'10px 22px',background:'var(--bg3)',border:'none',borderBottom:'1px solid var(--border)',color:'var(--text2)',fontFamily:'monospace',fontSize:14,fontWeight:700,flexShrink:0,width:'100%',textAlign:'left',letterSpacing:1}},
+    h('button',{onClick:function(){setShowGuide(function(v){return !v;});},style:{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'10px 22px',background:'var(--bg3)',border:'none',borderBottom:'1px solid var(--border)',color:'var(--text2)',fontFamily:'monospace',fontSize:14,fontWeight:700,flexShrink:0,width:'100%',textAlign:'left',letterSpacing:1}},
       h('span',null,'📋   '+(showGuide?'Hide':'Show')+' Speaking Guide'),
       h('span',{style:{opacity:.45,fontSize:12}},showGuide?'▲':'▼')
     ),
     status==='saving'&&h('div',{style:{padding:'7px 22px',background:'var(--bg3)',borderBottom:'1px solid var(--border)',color:'var(--amber)',fontFamily:'monospace',fontSize:11,letterSpacing:1,flexShrink:0}},statusMsg),
     status==='error'&&h('div',{style:{padding:'8px 22px',background:'rgba(224,120,120,.1)',borderBottom:'1px solid rgba(224,120,120,.3)',color:'var(--red)',fontFamily:'monospace',fontSize:11,flexShrink:0,lineHeight:1.5}},statusMsg),
     h('div',{style:{flex:1,display:'flex',overflow:'hidden',minHeight:0}},
-      showGuide&&h(GuidePanel,{guide}),
+      showGuide&&h(GuidePanel,{guide:guide}),
       h('div',{style:{flex:1,display:'flex',flexDirection:'column',padding:'14px 18px',overflow:'hidden'}},
         h('div',{style:{position:'relative',flex:1,display:'flex',flexDirection:'column',minHeight:0}},
-          h('textarea',{value:text,onChange:ev=>setText(ev.target.value),placeholder:'Tap here → tap 🎤 mic on keyboard → speak freely about all topics in the guide…',style:{flex:1,height:'100%'}}),
+          h('textarea',{value:text,onChange:function(ev){setText(ev.target.value);},placeholder:'Tap here → tap 🎤 mic on keyboard → speak freely about all topics in the guide…',style:{flex:1,height:'100%'}}),
           h('div',{style:{position:'absolute',top:14,right:14,fontSize:17,pointerEvents:'none',opacity:.25}},'🎤'),
           h('div',{style:{position:'absolute',bottom:11,right:14,color:'var(--text3)',fontFamily:'monospace',fontSize:12}},words+' words')
         )
       )
     ),
-    h('div',{style:{flexShrink:0,paddingBottom:'env(safe-area-inset-bottom)'}},
+    h('div',{className:'submit-bar'},
       h('button',{onClick:status==='saving'?null:handleSave,disabled:status==='saving',style:{width:'100%',padding:'19px',background:btnBg,border:'none',color:status==='saving'?'var(--amber)':'#fff',fontFamily:'monospace',fontSize:14,fontWeight:900,letterSpacing:3,transition:'all .3s',display:'block'}},btnTxt)
     )
   );
 }
 
 /* ══ SESSION SELECTOR ════════════════════════════════════════════ */
-function SessionSelector({onSelect,onHome,onWeekly}){
+function SessionSelector(props){
+  useViewportHeight();
   const sessions=[
     {id:'premarket',icon:'🌅',label:'Pre Market',color:'var(--teal)',meta:'Tab 1 · Before 9:30 AM'},
     {id:'tradelog',icon:'📊',label:'Trade Log',color:'var(--amber)',meta:'Tab 2 · After each trade'},
     {id:'eod',icon:'🌙',label:'End of Day',color:'var(--green)',meta:'Tabs 3+4 · After session'},
   ];
-  return h('div',{style:{position:'relative',zIndex:1,height:'100vh',height:'100dvh',background:'var(--bg)',display:'flex',flexDirection:'column'}},
+  return h('div',{className:'app-screen',style:{position:'relative',zIndex:1,background:'var(--bg)'}},
     h('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'13px 22px',borderBottom:'1px solid var(--border)',background:'var(--bg2)',flexShrink:0}},
       h('span',{style:{color:'var(--amber)',fontFamily:'monospace',fontSize:14,letterSpacing:2,fontWeight:700}},'✦  AVKAR · JOURNAL'),
-      h('button',{className:'btn-nav',onClick:onHome},'🏠  Home')
+      h('button',{className:'btn-nav',onClick:props.onHome},'🏠  Home')
     ),
     h('div',{style:{padding:'28px 22px',overflowY:'auto',flex:1}},
       h('div',{style:{borderLeft:'3px solid var(--amber-d)',paddingLeft:18,marginBottom:34,color:'var(--text2)',fontStyle:'italic',fontSize:16,lineHeight:1.8}},
@@ -592,17 +934,17 @@ function SessionSelector({onSelect,onHome,onWeekly}){
       h('div',{style:{color:'var(--text1)',fontSize:23,fontWeight:700,marginBottom:7,letterSpacing:.5}},'What are you logging?'),
       h('div',{style:{color:'var(--amber)',fontFamily:'monospace',fontSize:12,letterSpacing:2,marginBottom:26}},'CHOOSE YOUR SESSION TYPE'),
       h('div',{style:{display:'flex',gap:16,flexWrap:'wrap',marginBottom:20}},
-        sessions.map(s=>h('button',{key:s.id,onClick:()=>onSelect(s.id),style:{flex:'1 1 170px',minHeight:124,background:'var(--bg2)',border:'1.5px solid var(--border2)',borderRadius:14,color:s.color,fontSize:17,fontWeight:700,letterSpacing:1,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:10,padding:20,fontFamily:'Georgia,serif',transition:'background .15s'}},
+        sessions.map(function(s){return h('button',{key:s.id,onClick:function(){props.onSelect(s.id);},style:{flex:'1 1 170px',minHeight:124,background:'var(--bg2)',border:'1.5px solid var(--border2)',borderRadius:14,color:s.color,fontSize:17,fontWeight:700,letterSpacing:1,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:10,padding:20,fontFamily:'Georgia,serif',transition:'background .15s'}},
           h('span',{style:{fontSize:28}},s.icon),
           h('span',null,s.label),
           h('span',{style:{color:'var(--text3)',fontSize:12,fontFamily:'monospace',fontWeight:400,marginTop:2}},s.meta)
-        ))
+        );})
       ),
-      IS_SUNDAY&&h('button',{onClick:onWeekly,style:{width:'100%',background:'linear-gradient(135deg,#2a1a4a,#3d2a6a)',border:'1px solid var(--purple)',borderRadius:14,color:'var(--purple)',fontSize:15,fontWeight:700,letterSpacing:2,padding:'18px 20px',fontFamily:'monospace',display:'flex',alignItems:'center',justifyContent:'center',gap:12}},
+      IS_SUNDAY&&h('button',{onClick:props.onWeekly,style:{width:'100%',background:'linear-gradient(135deg,#2a1a4a,#3d2a6a)',border:'1px solid var(--purple)',borderRadius:14,color:'var(--purple)',fontSize:15,fontWeight:700,letterSpacing:2,padding:'18px 20px',fontFamily:'monospace',display:'flex',alignItems:'center',justifyContent:'center',gap:12}},
         h('span',{style:{fontSize:22}},'📊'),
         h('span',null,'SUNDAY RECALIBRATION')
       ),
-      !IS_SUNDAY&&h('button',{onClick:onWeekly,style:{width:'100%',background:'var(--bg2)',border:'1px solid var(--border)',borderRadius:14,color:'var(--text3)',fontSize:13,fontWeight:700,letterSpacing:2,padding:'14px 20px',fontFamily:'monospace',display:'flex',alignItems:'center',justifyContent:'center',gap:10}},
+      !IS_SUNDAY&&h('button',{onClick:props.onWeekly,style:{width:'100%',background:'var(--bg2)',border:'1px solid var(--border)',borderRadius:14,color:'var(--text3)',fontSize:13,fontWeight:700,letterSpacing:2,padding:'14px 20px',fontFamily:'monospace',display:'flex',alignItems:'center',justifyContent:'center',gap:10}},
         h('span',null,'📊  Weekly Analysis (Sunday)')
       )
     )
@@ -610,20 +952,22 @@ function SessionSelector({onSelect,onHome,onWeekly}){
 }
 
 /* ══ SPLASH ══════════════════════════════════════════════════════ */
-function Splash({quotes,onStart,onSettings}){
+function Splash(props){
+  useViewportHeight();
+  const quotes = props.quotes;
   const [idx,setIdx]=useState(0);
   const [fade,setFade]=useState(true);
   const [now,setNow]=useState(new Date());
-  useEffect(()=>{const t=setInterval(()=>setNow(new Date()),30000);return()=>clearInterval(t);},[]);
-  useEffect(()=>{
+  useEffect(function(){const t=setInterval(function(){setNow(new Date());},30000);return function(){clearInterval(t);};},[]);
+  useEffect(function(){
     if(quotes.length<=1)return;
-    const t=setInterval(()=>{setFade(false);setTimeout(()=>{setIdx(i=>(i+1)%quotes.length);setFade(true);},400);},60000);
-    return()=>clearInterval(t);
+    const t=setInterval(function(){setFade(false);setTimeout(function(){setIdx(function(i){return (i+1)%quotes.length;});setFade(true);},400);},60000);
+    return function(){clearInterval(t);};
   },[quotes.length]);
   const q=quotes[idx]||quotes[0];
   const ds=now.toLocaleDateString('en-US',{weekday:'long',month:'short',day:'numeric'});
   const ts=now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
-  return h('div',{style:{height:'100vh',height:'100dvh',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',position:'relative',zIndex:1,padding:'40px 36px'}},
+  return h('div',{className:'app-screen',style:{alignItems:'center',justifyContent:'center',position:'relative',zIndex:1,padding:'40px 36px'}},
     h('div',{style:{fontFamily:'monospace',fontSize:12,letterSpacing:5,color:'var(--amber)',marginBottom:54,opacity:.9,display:'flex',alignItems:'center',gap:12}},
       h('span',{style:{fontSize:15}},'✦'),'AVKAR',h('span',{style:{opacity:.3}},'·'),'TRADING JOURNAL'
     ),
@@ -631,10 +975,10 @@ function Splash({quotes,onStart,onSettings}){
       h('div',{style:{color:'var(--text1)',fontFamily:'Georgia,serif',fontSize:24,fontStyle:'italic',lineHeight:1.8,marginBottom:20}},'"'+q.text+'"'),
       q.author&&h('div',{style:{color:'var(--amber-d)',fontFamily:'monospace',fontSize:12,letterSpacing:3}},'— '+q.author.toUpperCase())
     ),
-    h('button',{className:'btn-cta',onClick:onStart},'START JOURNAL SESSION'),
+    h('button',{className:'btn-cta',onClick:props.onStart},'START JOURNAL SESSION'),
     h('div',{style:{display:'flex',gap:14,marginTop:22}},
-      IS_SUNDAY&&h('button',{onClick:onStart,style:{background:'linear-gradient(135deg,#2a1a4a,#3d2a6a)',border:'1px solid var(--purple)',color:'var(--purple)',borderRadius:11,padding:'11px 22px',fontFamily:'monospace',fontSize:13,letterSpacing:1}},'📊 Sunday Analysis'),
-      h('button',{onClick:onSettings,style:{background:'none',border:'1px solid var(--border2)',color:'var(--text3)',borderRadius:11,padding:'11px 22px',fontFamily:'monospace',fontSize:13,letterSpacing:1}},'⚙  Settings')
+      IS_SUNDAY&&h('button',{onClick:props.onStart,style:{background:'linear-gradient(135deg,#2a1a4a,#3d2a6a)',border:'1px solid var(--purple)',color:'var(--purple)',borderRadius:11,padding:'11px 22px',fontFamily:'monospace',fontSize:13,letterSpacing:1}},'📊 Sunday Analysis'),
+      h('button',{onClick:props.onSettings,style:{background:'none',border:'1px solid var(--border2)',color:'var(--text3)',borderRadius:11,padding:'11px 22px',fontFamily:'monospace',fontSize:13,letterSpacing:1}},'⚙  Settings')
     ),
     h('div',{style:{position:'absolute',bottom:30,color:'var(--text3)',fontFamily:'monospace',fontSize:12,letterSpacing:2}},ds+' · '+ts)
   );
@@ -642,17 +986,18 @@ function Splash({quotes,onStart,onSettings}){
 
 /* ══ APP ═════════════════════════════════════════════════════════ */
 function App(){
+  useViewportHeight();
   const [screen,setScreen]=useState('splash');
   const [session,setSession]=useState(null);
   const [showSettings,setShowSettings]=useState(false);
-  useEffect(()=>{if(!lget('ak','')||!lget('sid',''))setShowSettings(true);},[]);
-  return h('div',{style:{height:'100vh',height:'100dvh',background:'var(--bg)',overflow:'hidden'}},
+  useEffect(function(){if(!lget('ak','')||!lget('sid',''))setShowSettings(true);},[]);
+  return h('div',{style:{height:'var(--app-h)',background:'var(--bg)',overflow:'hidden'}},
     h(Stars),
-    showSettings&&h(SettingsModal,{onClose:()=>setShowSettings(false)}),
-    screen==='splash'&&h(Splash,{quotes:ALL_QUOTES,onStart:()=>setScreen('select'),onSettings:()=>setShowSettings(true)}),
-    screen==='select'&&h(SessionSelector,{onSelect:s=>{setSession(s);setScreen('journal');},onHome:()=>setScreen('splash'),onWeekly:()=>setScreen('weekly')}),
-    screen==='journal'&&h(JournalScreen,{session,onBack:()=>setScreen('select')}),
-    screen==='weekly'&&h(WeeklyScreen,{onBack:()=>setScreen('select')})
+    showSettings&&h(SettingsModal,{onClose:function(){setShowSettings(false);}}),
+    screen==='splash'&&h(Splash,{quotes:ALL_QUOTES,onStart:function(){setScreen('select');},onSettings:function(){setShowSettings(true);}}),
+    screen==='select'&&h(SessionSelector,{onSelect:function(s){setSession(s);setScreen('journal');},onHome:function(){setScreen('splash');},onWeekly:function(){setScreen('weekly');}}),
+    screen==='journal'&&h(JournalScreen,{session:session,onBack:function(){setScreen('select');}}),
+    screen==='weekly'&&h(WeeklyScreen,{onBack:function(){setScreen('select');}})
   );
 }
 ReactDOM.createRoot(document.getElementById('root')).render(h(App));
