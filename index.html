@@ -13,9 +13,15 @@
 <style>
 :root{--bg:#181d2a;--bg2:#1f2535;--bg3:#262e40;--bg4:#2d364a;--border:#2e3a50;--border2:#38485e;--amber:#d4956a;--amber-l:#ebbe96;--amber-d:#a8704e;--teal:#4ecdc4;--red:#e07878;--purple:#a08edc;--green:#5ec490;--text1:#ede9e0;--text2:#a8b0c0;--text3:#4e5a6a;--app-h:100dvh}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text1);font-family:Georgia,serif;-webkit-text-size-adjust:100%;position:fixed;width:100%;top:0;left:0;right:0;bottom:0}
+/* Base: Safari browser mode — natural scrolling layout */
+html,body{background:var(--bg);color:var(--text1);font-family:Georgia,serif;-webkit-text-size-adjust:100%;margin:0;padding:0;width:100%;min-height:100%}
+body{overflow:hidden}
 #root{height:var(--app-h);overflow:hidden;display:flex;flex-direction:column}
 .app-screen{height:var(--app-h);display:flex;flex-direction:column;overflow:hidden}
+/* PWA standalone: lock layout so keyboard doesn't collapse/blank the screen */
+@media (display-mode: standalone){
+  html,body{position:fixed;top:0;left:0;right:0;bottom:0;height:100%;overflow:hidden}
+}
 ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px}
 textarea{font-family:Georgia,serif;font-size:15px;color:var(--text1);background:var(--bg);border:1px solid var(--border2);border-radius:12px;padding:16px;line-height:1.9;resize:none;outline:none;width:100%}
 textarea::placeholder{color:var(--text3);font-style:italic}
@@ -44,7 +50,7 @@ const IS_SUNDAY = new Date().getDay() === 0;
 function lget(k,d){try{return localStorage.getItem(k)||d;}catch(e){return d||'';}}
 function lset(k,v){try{localStorage.setItem(k,v);}catch(e){}}
 
-/* ══ MASTER CONTEXT v2 — psychology + strategy + market environment ══ */
+/* ══ MASTER CONTEXT v2.1 — psychology + strategy + market environment ══ */
 const MASTER_CTX = `You are Avkar's integrated performance coach — trading psychologist, somatic therapist, behavioral scientist, shadow work guide, strategy coach, accountability partner. You lead. You hold a high standard. You do not lower it. You are direct and surgical. You do not soften truth. Warmth lives in the precision of what you name — not in diluting it.
 
 IMPORTANT OUTPUT RULE: Respond in plain text only. No markdown. No headers with ##. No bold with **. No pipe tables. No bullet asterisks. Use short paragraphs separated by blank lines. Use dashes for lists if needed.
@@ -205,7 +211,7 @@ Dysregulated: fragmented sentences, catastrophizing → body first before any co
 
 HALLUCINATION SAFEGUARDS: NEVER invent specifics not in data (specific P&L/dates/conversations). NEVER assume circuit breaker honored unless confirmed. NEVER tell him he is improving without specific behavioral metric. NEVER reference practice week without confirming. NEVER invent scenario or candle type — only reference what data or his statement confirms. NEVER suggest strategy change. NEVER evaluate trade by P&L — evaluate by THREE CRITERIA + THREE QUESTIONS. Father pattern is neurological absorption, NOT guilt.`;
 
-/* ══ COACHING PROMPTS v2 ═════════════════════════════════════════ */
+/* ══ COACHING PROMPTS v2.1 ═══════════════════════════════════════ */
 const DAILY_COACH_PROMPT = (sessionType, data, premarketContext) => `${MASTER_CTX}
 
 You are responding to Avkar's ${sessionType} journal entry. Read the extracted data carefully. Respond as his coach — direct, surgical, precise. Deeper response: name the pattern, explain the mechanism, ask the question.
@@ -227,11 +233,18 @@ UNIVERSAL RULES:
 
 ${sessionType === 'PRE-MARKET' ? `PRE-MARKET FOCUS (market NOT open yet — journaling before 9:30 AM):
 Market is closed. He hasn't traded yet. Calibrate him for the session.
+
+MANDATORY STRATEGY BRIEFING RULE — do NOT skip this:
+Unless the user explicitly says they will NOT trade today, you MUST include a scenario/level briefing based on whatever market data is present — even if data is sparse or partial. If only previous_day_candle is given — name the scenario tree from that alone. If only AVWAP position is given — anchor the day around AVWAP logic. If only key levels are given — pick the one most likely to matter based on bias. Even with minimal data, always give him ONE specific thing to watch. Never leave him without a strategic anchor for the morning unless he has stated he is stepping back.
+
+Deliver in this order:
 1. Nervous system state + which_version_today + sleep/alcohol/energy markers.
-2. If previous_day_candle is in data — identify the active scenario. Name the specific level to watch today: "Your one level today is [AVWAP / pre-market high / pre-market low / PDC based on scenario]. If price does not come there — you do not trade."
+2. Scenario briefing (see rule above). If previous_day_candle is present — name the active scenario tree. Name the specific level to watch today: "Your one level today is [AVWAP / pre-market high / pre-market low / PDC based on scenario]. If price does not come there — you do not trade."
 3. CRITICAL — the market environment gate: "Before you open Tradovate: read your dashboard. TICK, VOLD, MAG7, VIX, DXY. Get your overall score. If your bias from the scenario does not match the dashboard score — you trade half size or skip. Environment is the permission slip."
 4. If V1 markers present (alcohol/poor sleep/survival pressure/energy below 4/V1 today) — name it: "The data says your nervous system is already in threat mode. Trading from this state, the destruction sequence starts at Signal 1 or 2 — you are halfway there before the first candle."
-5. ONE physical action before platform opens.` : ''}
+5. ONE physical action before platform opens.
+
+If the user explicitly stated they are NOT trading today (e.g., "I am not going to trade today", "not trading", "just journaling"): acknowledge it once, then focus entirely on nervous system state and identity work. Skip scenario briefing. Still close with ONE physical action.` : ''}
 
 ${sessionType === 'TRADE LOG' ? `TRADE LOG FOCUS (during/after trade):
 Evaluate QUALITY of entry/exit/management — not P&L.
@@ -396,33 +409,34 @@ async function writeTab(sid, tab, headers, keys, data) {
   return {keys:keys,headers:headers,data:data};
 }
 
-/* ══ MARKDOWN STRIPPER (bug fix #3) ══════════════════════════════ */
+/* ══ MARKDOWN STRIPPER ═══════════════════════════════════════════ */
 function stripMarkdown(txt) {
   if(!txt) return '';
   return txt
-    .replace(/^#{1,6}\s+/gm, '')              // headings ## etc
-    .replace(/\*\*(.+?)\*\*/g, '$1')          // bold **
-    .replace(/__(.+?)__/g, '$1')              // bold __
-    .replace(/\*([^\*\n]+?)\*/g, '$1')        // italic *
-    .replace(/_([^_\n]+?)_/g, '$1')           // italic _
-    .replace(/`([^`\n]+?)`/g, '$1')           // inline code
-    .replace(/```[\s\S]*?```/g, '')           // fenced code
-    .replace(/^\s*[-*+]\s+/gm, '• ')          // list markers → bullets
-    .replace(/^\|.*\|$/gm, function(line) {   // table rows: strip pipes
+    .replace(/^#{1,6}\s+/gm, '')
+    .replace(/\*\*(.+?)\*\*/g, '$1')
+    .replace(/__(.+?)__/g, '$1')
+    .replace(/\*([^\*\n]+?)\*/g, '$1')
+    .replace(/_([^_\n]+?)_/g, '$1')
+    .replace(/`([^`\n]+?)`/g, '$1')
+    .replace(/```[\s\S]*?```/g, '')
+    .replace(/^\s*[-*+]\s+/gm, '• ')
+    .replace(/^\|.*\|$/gm, function(line) {
        return line.replace(/\|/g, ' ').replace(/\s+/g, ' ').trim();
     })
-    .replace(/^[\s|:-]+$/gm, '')              // table dividers
-    .replace(/━━+/g, '')                       // heavy lines
-    .replace(/═══+/g, '')                      // heavy double lines
-    .replace(/\n{3,}/g, '\n\n')                // collapse extra blank lines
+    .replace(/^[\s|:-]+$/gm, '')
+    .replace(/━━+/g, '')
+    .replace(/═══+/g, '')
+    .replace(/\n{3,}/g, '\n\n')
     .trim();
 }
 
-/* ══ VOICE UPGRADE (bug fix + voice priority + wake lock) ════════ */
+/* ══ VOICE UPGRADE — PWA-FIXED (synchronous gesture-preserving) ══ */
 let cachedVoice = null;
 
 function pickVoice() {
   if(cachedVoice) return cachedVoice;
+  if(!window.speechSynthesis) return null;
   const voices = window.speechSynthesis.getVoices();
   if(!voices || !voices.length) return null;
   const priorityExact = [
@@ -436,30 +450,26 @@ function pickVoice() {
     var v = voices.find(function(x){return x.name===priorityExact[i];});
     if(v) { cachedVoice = v; return v; }
   }
-  // any Enhanced/Premium English
   var enh = voices.find(function(x){return /Enhanced|Premium/.test(x.name) && /^en/.test(x.lang);});
   if(enh) { cachedVoice = enh; return enh; }
-  // any en-GB
   var gb = voices.find(function(x){return x.lang==='en-GB';});
   if(gb) { cachedVoice = gb; return gb; }
-  // any en-US
   var us = voices.find(function(x){return x.lang==='en-US';});
   if(us) { cachedVoice = us; return us; }
   return voices[0];
 }
 
-// Warm voice list — iOS populates asynchronously
 if(window.speechSynthesis) {
   window.speechSynthesis.onvoiceschanged = function(){ cachedVoice = null; pickVoice(); };
   setTimeout(function(){ pickVoice(); }, 200);
 }
 
-// Wake lock (keeps screen on during voice playback)
 let wakeLock = null;
-async function requestWakeLock() {
+function requestWakeLockFireAndForget() {
+  // Fire-and-forget — do NOT await. iOS requires speak() to be called synchronously in gesture handler.
   try {
     if('wakeLock' in navigator) {
-      wakeLock = await navigator.wakeLock.request('screen');
+      navigator.wakeLock.request('screen').then(function(wl){ wakeLock = wl; }).catch(function(){});
     }
   } catch(e) {}
 }
@@ -469,18 +479,21 @@ function releaseWakeLock() {
   } catch(e) {}
 }
 
-async function speakText(text) {
+// CRITICAL: speakText is SYNCHRONOUS. Must be called directly from a user gesture (button onClick).
+// Do NOT await anything before window.speechSynthesis.speak() — iOS will silently drop it.
+function speakText(text) {
   if(!window.speechSynthesis || !text) return;
   window.speechSynthesis.cancel();
-  await requestWakeLock();
-  // Chunk long text for reliability
   const utt = new SpeechSynthesisUtterance(text);
   utt.rate = 0.95; utt.pitch = 1.0; utt.volume = 1.0;
   const v = pickVoice();
   if(v) utt.voice = v;
   utt.onend = function(){ releaseWakeLock(); };
   utt.onerror = function(){ releaseWakeLock(); };
+  // Speak FIRST — preserves gesture context
   window.speechSynthesis.speak(utt);
+  // Then request wake lock as fire-and-forget
+  requestWakeLockFireAndForget();
 }
 
 function stopSpeaking() {
@@ -488,7 +501,7 @@ function stopSpeaking() {
   releaseWakeLock();
 }
 
-/* ══ VIEWPORT HOOK (bug fix #1 + #2: keyboard layout) ════════════ */
+/* ══ VIEWPORT HOOK — PWA-safe (only updates --app-h, doesn't break layout) ═ */
 function useViewportHeight() {
   useEffect(function(){
     function update() {
@@ -538,32 +551,162 @@ const ALL_QUOTES=[
   {id:20,text:"The scenario tree collapses to one level and one behavior. That is the entire game.",author:"Avkar Coaching System"},
 ];
 
-/* ══ GUIDE DATA ══════════════════════════════════════════════════ */
+/* ══ GUIDE DATA — each item is {text, critical:true/false} ═════════════
+   Critical items render at full brightness with slightly larger dot.
+   Non-critical items render at ~55% opacity.
+   ═════════════════════════════════════════════════════════════════════ */
 const PM_GUIDE=[
-  {s:"SLEEP & BODY",c:"var(--teal)",pause:false,i:["Sleep hours + quality — poor/ok/good","Alcohol last night?","Energy level 1–10","Supplement + ADHD med taken?"]},
-  {s:"RITUALS DONE",c:"var(--teal)",pause:false,i:["Cold water done?","Light exercise done?","Visualization/meditation done?","Body scan — what did you notice?","Identity statement read?","Alarmy ritual done? Music on?"]},
-  {s:"🔴 MENTAL STATE — yours",c:"var(--red)",pause:true,i:["Wanderer (V1) or Creator (V2) today?","What is my inner talk this morning?","Any active V1 belief right now?","Nervous system state — one word","Financial stress 1–10","Feeling survival pressure today?","Can I lose calmly today?"]},
-  {s:"🔴 TODAY'S INTENTION — yours",c:"var(--amber)",pause:true,i:["My single behavioral goal today","What to avoid — be specific","One rule I will protect no matter what","Max loss today / Max trades today","Dopamine bridge — my reward after session"]},
-  {s:"MARKET CONTEXT",c:"var(--purple)",pause:false,i:["Previous day candle — strong green/red/doji/hammer/pin/normal?","QQQ vs 2-Day AVWAP — above or below?","Overall bias — bullish/bearish/neutral","Key NQ levels today","Mag7 strength — bullish/bearish/mixed","Futures direction","Open scenario — which of the three"]},
-  {s:"🔴 PLAN — think and commit",c:"var(--teal)",pause:true,i:["Main plan today — one sentence","Entry type — anticipated or confirmed?","Entry trigger and confirmation signal","Stop level and invalidation","Two scenarios I am prepared for"]},
+  {s:"SLEEP & BODY",c:"var(--teal)",pause:false,i:[
+    {t:"Sleep hours + quality — poor/ok/good",k:false},
+    {t:"Alcohol last night?",k:true},
+    {t:"Energy level 1–10",k:true},
+    {t:"Supplement + ADHD med taken?",k:false}
+  ]},
+  {s:"RITUALS DONE",c:"var(--teal)",pause:false,i:[
+    {t:"Cold water done?",k:false},
+    {t:"Light exercise done?",k:false},
+    {t:"Visualization/meditation done?",k:false},
+    {t:"Body scan — what did you notice?",k:true},
+    {t:"Identity statement read?",k:true},
+    {t:"Alarmy ritual done? Music on?",k:false}
+  ]},
+  {s:"🔴 MENTAL STATE — yours",c:"var(--red)",pause:true,i:[
+    {t:"Wanderer (V1) or Creator (V2) today?",k:true},
+    {t:"What is my inner talk this morning?",k:false},
+    {t:"Any active V1 belief right now?",k:false},
+    {t:"Nervous system state — one word",k:true},
+    {t:"Financial stress 1–10",k:false},
+    {t:"Feeling survival pressure today?",k:false},
+    {t:"Can I lose calmly today?",k:true}
+  ]},
+  {s:"🔴 TODAY'S INTENTION — yours",c:"var(--amber)",pause:true,i:[
+    {t:"My single behavioral goal today",k:true},
+    {t:"What to avoid — be specific",k:false},
+    {t:"One rule I will protect no matter what",k:false},
+    {t:"Max loss today / Max trades today",k:true},
+    {t:"Dopamine bridge — my reward after session",k:false}
+  ]},
+  {s:"MARKET CONTEXT",c:"var(--purple)",pause:false,i:[
+    {t:"Previous day candle — strong green/red/doji/hammer/pin/normal?",k:true},
+    {t:"QQQ vs 2-Day AVWAP — above or below?",k:true},
+    {t:"Overall bias — bullish/bearish/neutral",k:false},
+    {t:"Key NQ levels today",k:true},
+    {t:"Mag7 strength — bullish/bearish/mixed",k:true},
+    {t:"Futures direction",k:false},
+    {t:"Open scenario — which of the three",k:false}
+  ]},
+  {s:"🔴 PLAN — think and commit",c:"var(--teal)",pause:true,i:[
+    {t:"Main plan today — one sentence",k:true},
+    {t:"Entry type — anticipated or confirmed?",k:false},
+    {t:"Entry trigger and confirmation signal",k:true},
+    {t:"Stop level and invalidation",k:true},
+    {t:"Two scenarios I am prepared for",k:false}
+  ]},
 ];
+
 const TL_GUIDE=[
-  {s:"TRADE BASICS",c:"var(--teal)",pause:false,i:["Entry time, direction, entry price","Contracts/size, account type","Profit target % before this trade","Setup name — main or scalp"]},
-  {s:"🔴 PRE-ENTRY — yours",c:"var(--amber)",pause:true,i:["Three Questions: environment / level / confirmation — all three?","Was the candle CLOSED before I entered?","Was FOMO involved?","Wanderer or Creator mindset at entry?","What did my body feel at entry?","Did I remove hand from mouse first?"]},
-  {s:"LEVELS",c:"var(--teal)",pause:false,i:["Planned entry vs actual entry","Planned stop vs actual stop","Invalidation level, target level","Exit level, P&L, exit reason"]},
-  {s:"🔴 EXECUTION — yours",c:"var(--red)",pause:true,i:["Did I follow the exact plan?","If no — what changed and why?","Did I move stop or exit early?","Did size increase after a loss?","Was this a recovery or zombie trade?"]},
-  {s:"🔴 EMOTIONS — feel and speak",c:"var(--purple)",pause:true,i:["Emotion before entry — one word","Emotion during trade — one word","Emotion at exit — one word","Body sensation, tilt stage (none/1/2/3)","Survival pressure? Cortisol spike?"]},
-  {s:"🔴 V1 vs V2 — identify",c:"var(--red)",pause:true,i:["Which version entered — V1/V2/mixed?","V1 inner talk — what did it say?","V2 inner talk — what did you tell yourself?","Destruction pattern activated?","Moment of choice — what interrupted it?"]},
-  {s:"🔴 REFLECTION — only you",c:"var(--amber)",pause:true,i:["ONE lesson from this trade","What would you do differently — specific","What if-then rule goes on your card?","What V2 response will you use next time?"]},
+  {s:"TRADE BASICS",c:"var(--teal)",pause:false,i:[
+    {t:"Entry time, direction, entry price",k:true},
+    {t:"Contracts/size, account type",k:false},
+    {t:"Profit target % before this trade",k:false},
+    {t:"Setup name — main or scalp",k:true}
+  ]},
+  {s:"🔴 PRE-ENTRY — yours",c:"var(--amber)",pause:true,i:[
+    {t:"Three Questions: environment / level / confirmation — all three?",k:true},
+    {t:"Was the candle CLOSED before I entered?",k:true},
+    {t:"Was FOMO involved?",k:false},
+    {t:"Wanderer or Creator mindset at entry?",k:true},
+    {t:"What did my body feel at entry?",k:false},
+    {t:"Did I remove hand from mouse first?",k:false}
+  ]},
+  {s:"LEVELS",c:"var(--teal)",pause:false,i:[
+    {t:"Planned entry vs actual entry",k:true},
+    {t:"Planned stop vs actual stop",k:false},
+    {t:"Invalidation level, target level",k:false},
+    {t:"Exit level, P&L, exit reason",k:true}
+  ]},
+  {s:"🔴 EXECUTION — yours",c:"var(--red)",pause:true,i:[
+    {t:"Did I follow the exact plan?",k:true},
+    {t:"If no — what changed and why?",k:false},
+    {t:"Did I move stop or exit early?",k:false},
+    {t:"Did size increase after a loss?",k:true},
+    {t:"Was this a recovery or zombie trade?",k:true}
+  ]},
+  {s:"🔴 EMOTIONS — feel and speak",c:"var(--purple)",pause:true,i:[
+    {t:"Emotion before entry — one word",k:true},
+    {t:"Emotion during trade — one word",k:false},
+    {t:"Emotion at exit — one word",k:false},
+    {t:"Body sensation, tilt stage (none/1/2/3)",k:true},
+    {t:"Survival pressure? Cortisol spike?",k:false}
+  ]},
+  {s:"🔴 V1 vs V2 — identify",c:"var(--red)",pause:true,i:[
+    {t:"Which version entered — V1/V2/mixed?",k:true},
+    {t:"V1 inner talk — what did it say?",k:true},
+    {t:"V2 inner talk — what did you tell yourself?",k:false},
+    {t:"Destruction pattern activated?",k:true},
+    {t:"Moment of choice — what interrupted it?",k:false}
+  ]},
+  {s:"🔴 REFLECTION — only you",c:"var(--amber)",pause:true,i:[
+    {t:"ONE lesson from this trade",k:true},
+    {t:"What would you do differently — specific",k:true},
+    {t:"What if-then rule goes on your card?",k:true},
+    {t:"What V2 response will you use next time?",k:false}
+  ]},
 ];
+
 const EOD_GUIDE=[
-  {s:"SESSION NUMBERS",c:"var(--teal)",pause:false,i:["Total P&L, planned vs unplanned trades","Plan adherence 1–10, behavioral score 1–10","Session duration, account type","Binary score — all 5 criteria met?","Consecutive rule-following days streak"]},
-  {s:"🔴 PATTERN REVIEW — yours",c:"var(--red)",pause:true,i:["P1 — early entries before confirmation?","P2 — valid setups skipped after loss?","P3 — exits before target?","P4 — zombie trades on autopilot?","Destruction pattern — what triggered it?","Where caught in sequence?"]},
-  {s:"🔴 V1 vs V2 — honest",c:"var(--amber)",pause:true,i:["Which version dominated — V1/V2/mixed?","V1 beliefs active today?","V1 inner talk — exactly what did it say?","V2 behaviors executed today?","Patient/fearless/disciplined/consistent 1–10"]},
-  {s:"TOOLS USED",c:"var(--teal)",pause:false,i:["Back position held? Mouse gate consistent?","5-second rule used? Verbal narration?","Circuit breaker triggered — honored?","20-min alarm used? Interruption used?"]},
-  {s:"🔴 SESSION REFLECTION — slow down",c:"var(--purple)",pause:true,i:["What went well — be specific","Best trade and why","Worst trade and why","Most in-control moment","Most out-of-control moment","One behavioral win today","One correction for tomorrow","Tomorrow's if-then rule"]},
-  {s:"🔴 LIFE & IDENTITY — as a person",c:"var(--green)",pause:true,i:["Overall V2 score 1–10","How close to the cricket kid today 1–10","Version that dominated life outside trading","Mood score + dominant feeling today","What triggered that feeling?","Daily goal — did you hit it?","Gratitude — one specific thing","One thing avoided that you should have done","One thing that moved forward today"]},
+  {s:"SESSION NUMBERS",c:"var(--teal)",pause:false,i:[
+    {t:"Total P&L, planned vs unplanned trades",k:true},
+    {t:"Plan adherence 1–10, behavioral score 1–10",k:true},
+    {t:"Session duration, account type",k:false},
+    {t:"Binary score — all 5 criteria met?",k:true},
+    {t:"Consecutive rule-following days streak",k:false}
+  ]},
+  {s:"🔴 PATTERN REVIEW — yours",c:"var(--red)",pause:true,i:[
+    {t:"P1 — early entries before confirmation?",k:true},
+    {t:"P2 — valid setups skipped after loss?",k:true},
+    {t:"P3 — exits before target?",k:true},
+    {t:"P4 — zombie trades on autopilot?",k:true},
+    {t:"Destruction pattern — what triggered it?",k:true},
+    {t:"Where caught in sequence?",k:true}
+  ]},
+  {s:"🔴 V1 vs V2 — honest",c:"var(--amber)",pause:true,i:[
+    {t:"Which version dominated — V1/V2/mixed?",k:true},
+    {t:"V1 beliefs active today?",k:false},
+    {t:"V1 inner talk — exactly what did it say?",k:true},
+    {t:"V2 behaviors executed today?",k:false},
+    {t:"Patient/fearless/disciplined/consistent 1–10",k:true}
+  ]},
+  {s:"TOOLS USED",c:"var(--teal)",pause:false,i:[
+    {t:"Back position held? Mouse gate consistent?",k:false},
+    {t:"5-second rule used? Verbal narration?",k:false},
+    {t:"Circuit breaker triggered — honored?",k:true},
+    {t:"20-min alarm used? Interruption used?",k:false}
+  ]},
+  {s:"🔴 SESSION REFLECTION — slow down",c:"var(--purple)",pause:true,i:[
+    {t:"What went well — be specific",k:false},
+    {t:"Best trade and why",k:false},
+    {t:"Worst trade and why",k:true},
+    {t:"Most in-control moment",k:false},
+    {t:"Most out-of-control moment",k:true},
+    {t:"One behavioral win today",k:true},
+    {t:"One correction for tomorrow",k:false},
+    {t:"Tomorrow's if-then rule",k:true}
+  ]},
+  {s:"🔴 LIFE & IDENTITY — as a person",c:"var(--green)",pause:true,i:[
+    {t:"Overall V2 score 1–10",k:true},
+    {t:"How close to the cricket kid today 1–10",k:true},
+    {t:"Version that dominated life outside trading",k:false},
+    {t:"Mood score + dominant feeling today",k:false},
+    {t:"What triggered that feeling?",k:false},
+    {t:"Daily goal — did you hit it?",k:false},
+    {t:"Gratitude — one specific thing",k:false},
+    {t:"One thing avoided that you should have done",k:true},
+    {t:"V2 moment today — one specific moment",k:true},
+    {t:"One thing that moved forward today",k:false}
+  ]},
 ];
+
 const GUIDES={premarket:PM_GUIDE,tradelog:TL_GUIDE,eod:EOD_GUIDE};
 const META={
   premarket:{label:"PRE-MARKET PREP",color:"var(--teal)",sub:"Tab 1 · Before 9:30 AM"},
@@ -575,20 +718,28 @@ const META={
 const STARS=Array.from({length:40},function(_,i){return{id:i,x:Math.random()*100,y:Math.random()*100,s:Math.random()*1.4+0.4,o:Math.random()*0.18+0.06};});
 function Stars(){return h('div',{style:{position:'fixed',inset:0,pointerEvents:'none',zIndex:0}},STARS.map(function(s){return h('div',{key:s.id,style:{position:'absolute',left:s.x+'%',top:s.y+'%',width:s.s,height:s.s,borderRadius:'50%',background:'#b0bcd0',opacity:s.o}});}));}
 
-/* ══ GUIDE PANEL ═════════════════════════════════════════════════ */
+/* ══ GUIDE PANEL — 33% width, item-level highlighting ════════════ */
 function GuidePanel(props){
   var guide = props.guide;
-  return h('div',{style:{width:'30%',flexShrink:0,overflowY:'auto',padding:'16px 12px 16px 18px',borderRight:'1px solid var(--border)',height:'100%'}},
+  return h('div',{style:{width:'33%',flexShrink:0,overflowY:'auto',padding:'16px 12px 16px 18px',borderRight:'1px solid var(--border)',height:'100%'}},
     guide.map(function(b){return h('div',{key:b.s,style:{marginBottom:20}},
       h('div',{style:{display:'flex',alignItems:'center',gap:8,marginBottom:9,paddingBottom:6,borderBottom:'1px solid var(--border)'}},
         h('div',{style:{width:8,height:8,borderRadius:'50%',background:b.c,flexShrink:0}}),
         h('span',{style:{color:b.c,fontSize:10,letterSpacing:2,fontFamily:'monospace',fontWeight:700}},b.s),
         b.pause&&h('span',{style:{marginLeft:'auto',background:'rgba(212,149,106,.15)',border:'1px solid rgba(212,149,106,.3)',color:'var(--amber-l)',fontSize:9,fontFamily:'monospace',padding:'1px 7px',borderRadius:10,letterSpacing:1}},'REFLECT')
       ),
-      b.i.map(function(item){return h('div',{key:item,style:{display:'flex',alignItems:'flex-start',gap:10,marginBottom:8}},
-        h('div',{style:{width:b.pause?7:5,height:b.pause?7:5,borderRadius:'50%',background:b.pause?b.c:'var(--border2)',flexShrink:0,marginTop:5}}),
-        h('span',{style:{fontSize:b.pause?14:13,fontWeight:b.pause?700:500,color:b.pause?'var(--amber-l)':'var(--text1)',lineHeight:1.5,fontFamily:'monospace'}},item)
-      );})
+      b.i.map(function(item){
+        var isCrit = item.k;
+        var dotSize = isCrit ? (b.pause?8:6) : (b.pause?6:4);
+        var textOpacity = isCrit ? 1 : 0.55;
+        var fontWeight = isCrit ? (b.pause?800:700) : (b.pause?600:400);
+        var textColor = isCrit ? (b.pause?'var(--amber-l)':'var(--text1)') : (b.pause?'var(--amber-l)':'var(--text1)');
+        var dotBg = isCrit ? b.c : (b.pause?b.c:'var(--border2)');
+        return h('div',{key:item.t,style:{display:'flex',alignItems:'flex-start',gap:10,marginBottom:8,opacity:textOpacity}},
+          h('div',{style:{width:dotSize,height:dotSize,borderRadius:'50%',background:dotBg,flexShrink:0,marginTop:5,boxShadow:isCrit?'0 0 0 2px rgba(212,149,106,.15)':'none'}}),
+          h('span',{style:{fontSize:b.pause?14:13,fontWeight:fontWeight,color:textColor,lineHeight:1.5,fontFamily:'monospace'}},item.t)
+        );
+      })
     );})
   );
 }
@@ -685,11 +836,13 @@ function WeeklyScreen(props){
     alert('Report saved for next week reference.');
   };
 
+  // SYNCHRONOUS — must be called directly from button onClick
   const speakLast = () => {
     if(speaking) { stopSpeaking(); setSpeaking(false); return; }
     const lastCoach = [...messages].reverse().find(function(m){return m.role==='coach';});
     if(!lastCoach) return;
-    speakText(lastCoach.text); setSpeaking(true);
+    speakText(lastCoach.text); // synchronous
+    setSpeaking(true);
     const check = setInterval(function(){if(!window.speechSynthesis.speaking){setSpeaking(false);clearInterval(check);}},500);
   };
 
@@ -779,9 +932,11 @@ function JournalScreen(props){
   const words=text.trim()?text.trim().split(/\s+/).length:0;
   const ak=lget('ak',''); const sid=lget('sid','');
 
-  const speak=function(t){
+  // SYNCHRONOUS — must be called directly from button onClick
+  const speak = function(t){
     if(speaking){stopSpeaking();setSpeaking(false);return;}
-    speakText(t); setSpeaking(true);
+    speakText(t); // synchronous, preserves gesture
+    setSpeaking(true);
     const check=setInterval(function(){if(!window.speechSynthesis.speaking){setSpeaking(false);clearInterval(check);}},500);
   };
 
@@ -791,14 +946,13 @@ function JournalScreen(props){
     setStatus('saving'); setStatusMsg('');
     try {
       let extractedData = null;
-      let interventionData = null;  // LOCAL variable — not state
+      let interventionData = null;
 
       if(session==='premarket'){
         setStatusMsg('Extracting pre-market fields…');
         const d = await callClaudeJSON(ak,PM_EXTRACT,text);
         setStatusMsg('Writing Pre-Market Prep tab…');
         await writeTab(sid,'Pre-Market Prep',T1H,T1K,d);
-        // Save PM data for EOD coaching context (Pre-Market → EOD connection)
         lset('last_premarket_data', JSON.stringify({date:TODAY,data:d}));
         extractedData = {sessionType:'PRE-MARKET',data:d};
         setStatusMsg('Running readiness check…');
@@ -826,7 +980,6 @@ function JournalScreen(props){
         extractedData = {sessionType:'END OF DAY',data:Object.assign({},d3,d4)};
       }
 
-      // Generate coaching — with premarket context for EOD
       setStatusMsg('Generating coaching response…');
       let premarketContext = '';
       if(session==='eod'){
@@ -841,7 +994,6 @@ function JournalScreen(props){
       const coachTxt = await callClaude(ak,DAILY_COACH_PROMPT(extractedData.sessionType,extractedData.data,premarketContext),'',700);
       const cleanCoach = stripMarkdown(coachTxt);
 
-      // Write Coaching Log with LOCAL interventionData (bug fix #4)
       setStatusMsg('Saving coaching log…');
       const clData={
         date:TODAY,
@@ -857,11 +1009,9 @@ function JournalScreen(props){
       };
       await writeTab(sid,'Coaching Log',TCH,TCK,clData);
 
-      // Clean up
       setText('');
       setStatus('idle'); setStatusMsg('');
 
-      // Show intervention first (with pending coaching attached), OR show coaching directly
       if(interventionData){
         setIntervention({text:interventionData.text,score:interventionData.score,pendingCoaching:cleanCoach});
       } else {
